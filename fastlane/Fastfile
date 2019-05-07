@@ -1,0 +1,43 @@
+# Import base_config from git
+import_from_git(url: 'https://github.com/rakutentech/ios-buildconfig.git')
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Build everything"
+  lane :ci do |options|
+    # Use env variables to set up endpoints/keys in order to keep them secret
+    set_info_plist_value(path: "./Sample/Info.plist",
+                         key: "RRCConfigAPIEndpoint",
+                         value: ENV['REM_FL_RRC_CONFIG_ENDPOINT'] || "https://performance-endpoint.com")
+    set_info_plist_value(path: "./Sample/Info.plist",
+                         key: "RRCSubscriptionKey",
+                         value: ENV['REM_FL_RRC_SUBSCRIPTION_KEY'] || "SUBSCRIPTION_KEY")
+
+    swiftlint(
+      strict: true
+    )
+
+    cocoapods(repo_update: ENV['REM_FL_CP_REPO_UPDATE'] || false)
+
+    scan(
+      clean: true,
+      output_directory: './artifacts/unit-tests',
+      scheme: ENV['REM_FL_TESTS_SCHEME'] || 'Tests',
+      device: ENV['REM_FL_TESTS_DEVICE'] || 'REM SDK Unit Tests',
+      code_coverage: true,
+      output_types: 'json-compilation-database,html,junit',
+      output_files: 'compile_commands.json,report.html,report.junit')
+
+    # FIXME: disabled because coverage is not being generated in project
+    # slather(
+    #   output_directory: './artifacts/coverage',
+    #   scheme: ENV['REM_FL_TESTS_SCHEME'] || 'Tests',
+    #   cobertura_xml: true,
+    #   proj: ENV['REM_FL_TESTS_PROJECT'],
+    #   workspace: ENV['REM_FL_TESTS_WORKSPACE']
+    #   binary_basename: ENV['REM_FL_TESTS_SLATHER_BASENAME'],
+    #   ignore: '../*')
+  end
+end
+# vim:syntax=ruby:et:sts=2:sw=2:ts=2:ff=unix:
