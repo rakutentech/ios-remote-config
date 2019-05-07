@@ -8,6 +8,7 @@ pod 'RRemoteConfig', :path => './RRemoteConfig.podspec'
 target 'SampleApp'
 target 'UnitTests'
 target 'FunctionalTests'
+target 'Tests' # both Functional and Unit tests
 
 # For CI: This post install hook enables more warnings for the module's target
 post_install do |installer|

@@ -1,4 +1,5 @@
 import XCTest
+import RRemoteConfig
 
 class UnitTests: XCTestCase {
 
@@ -13,6 +14,8 @@ class UnitTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
+        let remoteConfig = RemoteConfig.init(foo: "bar")
+        remoteConfig.foo()
     }
 
     func testPerformanceExample() {
