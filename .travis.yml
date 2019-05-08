@@ -9,6 +9,5 @@ before_install:
 
 script: fastlane ci
 
-# FIXME: disabled because coverage is not being generated in project
-# after_success:
-# - bash <(curl -s https://codecov.io/bash) -f ./artifacts/coverage/cobertura.xml -X coveragepy -X gcov -X xcode
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -J RRemoteConfig -X gcov -X coveragepy -f '!*.xml'

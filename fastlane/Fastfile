@@ -28,16 +28,21 @@ platform :ios do
       code_coverage: true,
       output_types: 'json-compilation-database,html,junit',
       output_files: 'compile_commands.json,report.html,report.junit')
+  end
 
-    # FIXME: disabled because coverage is not being generated in project
-    # slather(
-    #   output_directory: './artifacts/coverage',
-    #   scheme: ENV['REM_FL_TESTS_SCHEME'] || 'Tests',
-    #   cobertura_xml: true,
-    #   proj: ENV['REM_FL_TESTS_PROJECT'],
-    #   workspace: ENV['REM_FL_TESTS_WORKSPACE']
-    #   binary_basename: ENV['REM_FL_TESTS_SLATHER_BASENAME'],
-    #   ignore: '../*')
+  desc "Generate code coverage locally"
+  lane :coverage do |options|
+    xcov(
+      workspace: 'RRemoteConfig.xcworkspace',
+      scheme: 'Tests',
+      output_directory: 'artifacts/unit-tests/coverage',
+      source_directory: './RRemoteConfig',
+      json_report: true,
+      include_targets: 'RRemoteConfig.framework',
+      include_test_targets: false,
+      skip_slack: true,
+      disable_coveralls: true
+    )
   end
 end
 # vim:syntax=ruby:et:sts=2:sw=2:ts=2:ff=unix:
