@@ -1,3 +1,14 @@
 line_length:
   - 200 # warning
   - 300 # error
+function_body_length:
+  - 100
+  - 100
+nesting:
+  - 5
+  - 5
+cyclomatic_complexity:
+  - 20
+  - 20
+excluded:
+  - Pods

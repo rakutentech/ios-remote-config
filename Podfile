@@ -6,12 +6,22 @@ use_frameworks!
 pod 'RRemoteConfig', :path => './RRemoteConfig.podspec'
 
 target 'SampleApp'
-target 'UnitTests'
-target 'FunctionalTests'
-target 'Tests' # both Functional and Unit tests
 
-# For CI: This post install hook enables more warnings for the module's target
+target 'Tests' do # both Functional and Unit tests
+  target 'UnitTests'
+  target 'FunctionalTests'
+  pod 'Quick'
+  pod 'Nimble'
+end
+
 post_install do |installer|
+  # Needed so 'internal' module classes can be tested
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+        config.build_settings['ENABLE_TESTABILITY'] = 'YES'
+    end
+  end
+  # Enable more warnings for the module's target
   installer.pods_project.targets.select { |target| target.name == 'RRemoteConfig' }.first.build_configurations.each do |config|
     config.build_settings.merge!({
       # Static code analyzer

@@ -9,6 +9,7 @@
 xcuserdata
 *.xccheckout
 *.xcworkspace
+*.playground
 build
 
 # Cocoapods
@@ -18,3 +19,4 @@ Pods
 /artifacts
 /fastlane/report.xml
 /fastlane/README.md
+/fastlane/.env
