@@ -12,6 +12,11 @@ extension URLSession: SessionProtocol {
 
 internal class APIClient {
     let session: SessionProtocol
+
+    init(session: SessionProtocol = URLSession.shared) {
+        self.session = session
+    }
+
     func send<T>(request: URLRequest, decodeAs: T.Type, completionHandler: @escaping (Result<Any, Error>) -> Void) where T: Decodable {
 
         session.startTask(with: request) { (data, response, error) in
@@ -37,10 +42,6 @@ internal class APIClient {
                 }
             }
         }
-    }
-
-    init(session: SessionProtocol = URLSession.shared) {
-        self.session = session
     }
 }
 

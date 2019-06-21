@@ -15,7 +15,7 @@ internal class Environment {
             print("Ensure RASApplicationIdentifier and RRCConfigAPIEndpoint values in plist are valid")
             return nil
         }
-        return URL(string: "\(endpointUrlString)/\(appId)/config")
+        return URL(string: "\(endpointUrlString)/app/\(appId)/config")
     }
     var subscriptionKey: String {
         return bundle.value(for: "RASProjectSubscriptionKey") ?? ""
