@@ -24,6 +24,6 @@ Pod::Spec.new do |s|
   s.weak_frameworks = [
     'Foundation',
   ]
-  s.source_files = "RRemoteConfig/**/*.Swift"
+  s.source_files = "RRemoteConfig/**/*.{Swift,m}"
 end
 # vim:syntax=ruby:et:sts=2:sw=2:ts=2:ff=unix:

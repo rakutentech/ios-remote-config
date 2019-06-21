@@ -6,16 +6,9 @@ default_platform(:ios)
 platform :ios do
   desc "Build everything"
   lane :ci do |options|
-    # Use env variables to set up endpoints/keys in order to keep them secret
-    set_info_plist_value(path: "./Sample/Info.plist",
-                         key: "RRCConfigAPIEndpoint",
-                         value: ENV['REM_FL_RRC_CONFIG_ENDPOINT'] || "https://performance-endpoint.com")
-    set_info_plist_value(path: "./Sample/Info.plist",
-                         key: "RRCSubscriptionKey",
-                         value: ENV['REM_FL_RRC_SUBSCRIPTION_KEY'] || "SUBSCRIPTION_KEY")
-
     swiftlint(
-      strict: true
+      strict: true,
+      ignore_exit_status: false
     )
 
     cocoapods(repo_update: ENV['REM_FL_CP_REPO_UPDATE'] || false)
@@ -28,6 +21,20 @@ platform :ios do
       code_coverage: true,
       output_types: 'json-compilation-database,html,junit',
       output_files: 'compile_commands.json,report.html,report.junit')
+  end
+
+  desc "Set up environment"
+  lane :setup_env do
+    # Use env variables to set up endpoints/keys in order to keep them secret
+    set_info_plist_value(path: "./Sample/Info.plist",
+                         key: "RASApplicationIdentifier",
+                         value: ENV['RAS_APPLICATION_IDENTIFIER'] || "APP_ID")
+    set_info_plist_value(path: "./Sample/Info.plist",
+                         key: "RASProjectSubscriptionKey",
+                         value: ENV['RAS_PROJECT_SUBSCRIPTION_KEY'] || "SUBSCRIPTION_KEY")
+    set_info_plist_value(path: "./Sample/Info.plist",
+                         key: "RRCConfigAPIEndpoint",
+                         value: ENV['RRC_CONFIG_API_ENDPOINT'] || "https://config-endpoint.com")
   end
 
   desc "Generate code coverage locally"
