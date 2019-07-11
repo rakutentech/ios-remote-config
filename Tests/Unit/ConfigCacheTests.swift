@@ -65,5 +65,36 @@ class ConfigCacheSpec: QuickSpec {
                 expect(value).to(equal(fallback))
             }
         }
+        describe("refreshFromRemote function") {
+            class FetcherMock: ConfigFetcher {
+                var fetcherCalledNumTimes = 0
+                var fetchedConfig = ConfigModel(config: ["": ""])
+
+                override func fetch(completionHandler: @escaping (ConfigModel?) -> Void) {
+                    fetcherCalledNumTimes += 1
+                    completionHandler(fetchedConfig)
+                }
+            }
+
+            it("calls the fetcher's fetch function exactly once") {
+                let fetcher = FetcherMock(client: APIClient(), environment: Environment())
+                let configCache = ConfigCache(fetcher: fetcher, poller: ConfigPoller())
+
+                configCache.refreshFromRemote()
+
+                expect(fetcher.fetcherCalledNumTimes).to(equal(1))
+            }
+
+            it("writes the fetched config to the cache file") {
+                let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("foo")
+                let fetcher = FetcherMock(client: APIClient(), environment: Environment())
+                fetcher.fetchedConfig = ConfigModel(config: ["foo": "bar"])
+                let configCache = ConfigCache(fetcher: fetcher, poller: ConfigPoller())
+
+                configCache.refreshFromRemote()
+
+                expect(NSDictionary(contentsOf: url)).to(equal(["foo": "bar"]))
+            }
+        }
     }
 }

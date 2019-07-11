@@ -1,6 +1,3 @@
-internal class ConfigPoller {
-}
-
 internal class ConfigCache {
     let fetcher: ConfigFetcher
     let poller: ConfigPoller
@@ -35,11 +32,13 @@ internal class ConfigCache {
     }
 
     func refreshFromRemote() {
-        self.fetcher.fetch { (result) in
-            guard let config = result?.config else {
-                return print("Config could not be refreshed from remote")
+        self.poller.start {
+            self.fetcher.fetch { (result) in
+                guard let config = result?.config else {
+                    return print("Config could not be refreshed from remote")
+                }
+                self.write(config)
             }
-            self.write(config)
         }
     }
 
