@@ -4,7 +4,10 @@ internal class ConfigPoller {
 
     init(delay: TimeInterval = 60.0 * 60.0) {
         self.delay = delay
-        self.timer = Timer()
+
+        // initialize with dummy timer
+        self.timer = Timer(timeInterval: 1.0, repeats: false, block: { (_) in
+        })
     }
 
     func start(action: @escaping () -> Void) {
