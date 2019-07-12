@@ -1,11 +1,11 @@
 internal class ConfigCache {
     let fetcher: ConfigFetcher
-    let poller: ConfigPoller
+    let poller: Poller
     let cacheUrl: URL
     private var activeConfig: ConfigModel? = ConfigModel(config: [:])
 
     init(fetcher: ConfigFetcher,
-         poller: ConfigPoller,
+         poller: Poller,
          cacheUrl: URL = FileManager.getCacheDirectory().appendingPathComponent("rrc-config.plist"),
          initialCacheContents: [String: String]? = nil) {
         self.fetcher = fetcher

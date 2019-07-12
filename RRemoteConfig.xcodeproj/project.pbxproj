@@ -18,8 +18,8 @@
 		6D622B1922BA243D001FD625 /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D622B1722BA243D001FD625 /* APIClientTests.swift */; };
 		6D622B1B22BA25B8001FD625 /* ConfigFetcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D622B1A22BA25B8001FD625 /* ConfigFetcherTests.swift */; };
 		6D622B1C22BA25B8001FD625 /* ConfigFetcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D622B1A22BA25B8001FD625 /* ConfigFetcherTests.swift */; };
-		6D622B1E22BB1218001FD625 /* ConfigPollerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D622B1D22BB1218001FD625 /* ConfigPollerTests.swift */; };
-		6D622B1F22BB1218001FD625 /* ConfigPollerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D622B1D22BB1218001FD625 /* ConfigPollerTests.swift */; };
+		6D622B1E22BB1218001FD625 /* PollerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D622B1D22BB1218001FD625 /* PollerTests.swift */; };
+		6D622B1F22BB1218001FD625 /* PollerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D622B1D22BB1218001FD625 /* PollerTests.swift */; };
 		6D622B2122BB1251001FD625 /* RealRemoteConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D622B2022BB1251001FD625 /* RealRemoteConfigTests.swift */; };
 		6D622B2222BB1251001FD625 /* RealRemoteConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D622B2022BB1251001FD625 /* RealRemoteConfigTests.swift */; };
 		6D622B2422BB1271001FD625 /* ConfigCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D622B2322BB1271001FD625 /* ConfigCacheTests.swift */; };
@@ -67,7 +67,7 @@
 		3A4FFAF6091C4DAAA9F8549C /* Main.storyboard */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.storyboard; name = Main.storyboard; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		6D622B1722BA243D001FD625 /* APIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClientTests.swift; sourceTree = "<group>"; };
 		6D622B1A22BA25B8001FD625 /* ConfigFetcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigFetcherTests.swift; sourceTree = "<group>"; };
-		6D622B1D22BB1218001FD625 /* ConfigPollerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigPollerTests.swift; sourceTree = "<group>"; };
+		6D622B1D22BB1218001FD625 /* PollerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollerTests.swift; sourceTree = "<group>"; };
 		6D622B2022BB1251001FD625 /* RealRemoteConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealRemoteConfigTests.swift; sourceTree = "<group>"; };
 		6D622B2322BB1271001FD625 /* ConfigCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigCacheTests.swift; sourceTree = "<group>"; };
 		904EAA9F750B684EFBA9CC89 /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -128,7 +128,7 @@
 				EA7DC363E7CCB25C0C06009E /* EnvironmentTests.swift */,
 				6D622B1722BA243D001FD625 /* APIClientTests.swift */,
 				6D622B1A22BA25B8001FD625 /* ConfigFetcherTests.swift */,
-				6D622B1D22BB1218001FD625 /* ConfigPollerTests.swift */,
+				6D622B1D22BB1218001FD625 /* PollerTests.swift */,
 				6D622B2022BB1251001FD625 /* RealRemoteConfigTests.swift */,
 				6D622B2322BB1271001FD625 /* ConfigCacheTests.swift */,
 			);
@@ -370,7 +370,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6D622B1F22BB1218001FD625 /* ConfigPollerTests.swift in Sources */,
+				6D622B1F22BB1218001FD625 /* PollerTests.swift in Sources */,
 				6D622B2522BB1271001FD625 /* ConfigCacheTests.swift in Sources */,
 				6D622B1922BA243D001FD625 /* APIClientTests.swift in Sources */,
 				6D622B1C22BA25B8001FD625 /* ConfigFetcherTests.swift in Sources */,
@@ -388,7 +388,7 @@
 				9A907C265DBCF37473D7AB76 /* EnvironmentTests.swift in Sources */,
 				6D622B1822BA243D001FD625 /* APIClientTests.swift in Sources */,
 				6D622B1B22BA25B8001FD625 /* ConfigFetcherTests.swift in Sources */,
-				6D622B1E22BB1218001FD625 /* ConfigPollerTests.swift in Sources */,
+				6D622B1E22BB1218001FD625 /* PollerTests.swift in Sources */,
 				6D622B2122BB1251001FD625 /* RealRemoteConfigTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

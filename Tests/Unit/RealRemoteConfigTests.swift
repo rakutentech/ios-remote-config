@@ -19,7 +19,7 @@ class RealRemoteConfigSpec: QuickSpec {
     override func spec() {
         describe("getString function") {
             it("calls config cache get string") {
-                RealRemoteConfig.shared.cache = CacheMock(fetcher: ConfigFetcher(client: APIClient(), environment: Environment()), poller: ConfigPoller())
+                RealRemoteConfig.shared.cache = CacheMock(fetcher: ConfigFetcher(client: APIClient(), environment: Environment()), poller: Poller())
 
                 _ = RealRemoteConfig.shared.getString("foo", "bar")
 
@@ -34,7 +34,7 @@ class RealRemoteConfigSpec: QuickSpec {
         }
         describe("refreshConfig function") {
             it("calls config cache refresh from remote") {
-                RealRemoteConfig.shared.cache = CacheMock(fetcher: ConfigFetcher(client: APIClient(), environment: Environment()), poller: ConfigPoller())
+                RealRemoteConfig.shared.cache = CacheMock(fetcher: ConfigFetcher(client: APIClient(), environment: Environment()), poller: Poller())
 
                 RealRemoteConfig.shared.refreshConfig()
 
