@@ -1,9 +1,21 @@
-internal class Poller {
-    let delay: TimeInterval
-    var timer: Timer?
+protocol PollerRunLoopProtocol {
+    func addTimer(_ timer: Timer)
+}
 
-    init(delay: TimeInterval = 60.0 * 60.0) {
+extension RunLoop: PollerRunLoopProtocol {
+    func addTimer(_ timer: Timer) {
+        add(timer, forMode: .common)
+    }
+}
+
+internal class Poller {
+    private let delay: TimeInterval
+    private var runLoop: PollerRunLoopProtocol?
+    private var timer: Timer?
+
+    init(delay: TimeInterval = 60.0 * 60.0, runLoop: PollerRunLoopProtocol = RunLoop.current) {
         self.delay = delay
+        self.runLoop = runLoop
     }
 
     func start(action: @escaping () -> Void) {
@@ -18,20 +30,9 @@ internal class Poller {
         if let timer = self.timer {
             timer.tolerance = 0.1 * self.delay
             DispatchQueue.main.async {
-                RunLoop.current.add(timer, forMode: .common)
-            }
-        }
-    }
-
-    func stop() {
-        guard let timer = self.timer else {
-            return
-        }
-        if timer.isValid {
-            // timer must be invalidated on the same thread
-            // it was added to the run loop
-            DispatchQueue.main.async {
-                timer.invalidate()
+                // note: timer must be invalidated on the
+                // same thread it was added to the run loop
+                self.runLoop?.addTimer(timer)
             }
         }
     }

@@ -3,38 +3,18 @@ import Nimble
 @testable import RRemoteConfig
 
 class RealRemoteConfigSpec: QuickSpec {
-    class CacheMock: ConfigCache {
-        var getStringCalled = false
-        var refreshCalled = false
-
-        override func refreshFromRemote() {
-            self.refreshCalled = true
-        }
-
-        override func getString(_ key: String, _ fallback: String) -> String {
-            self.getStringCalled = true
-            return fallback
-        }
-    }
     override func spec() {
         describe("getString function") {
-            it("calls config cache get string") {
-                RealRemoteConfig.shared.cache = CacheMock(fetcher: ConfigFetcher(client: APIClient(), environment: Environment()), poller: Poller())
-
-                _ = RealRemoteConfig.shared.getString("foo", "bar")
-
-                expect((RealRemoteConfig.shared.cache as? CacheMock)?.getStringCalled).to(equal(true))
-            }
-
             it("returns a string") {
-                let string = RealRemoteConfig.shared.getString("foo", "bar")
+                RealRemoteConfig.shared.cache = createCacheMock(initialContents: ["foo": "moo"])
 
-                expect(string).to(equal("bar"))
+                expect(RealRemoteConfig.shared.getString("foo", "bar")).to(equal("moo"))
             }
         }
         describe("refreshConfig function") {
-            it("calls config cache refresh from remote") {
-                RealRemoteConfig.shared.cache = CacheMock(fetcher: ConfigFetcher(client: APIClient(), environment: Environment()), poller: Poller())
+            it("calls config cache refresh") {
+                RealRemoteConfig.shared.cache = createCacheMock()
+                (RealRemoteConfig.shared.cache as? CacheMock)?.refreshCalled = false
 
                 RealRemoteConfig.shared.refreshConfig()
 
