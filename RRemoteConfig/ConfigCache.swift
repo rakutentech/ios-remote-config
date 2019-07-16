@@ -1,14 +1,11 @@
-internal class ConfigPoller {
-}
-
 internal class ConfigCache {
     let fetcher: ConfigFetcher
-    let poller: ConfigPoller
+    let poller: Poller
     let cacheUrl: URL
     private var activeConfig: ConfigModel? = ConfigModel(config: [:])
 
     init(fetcher: ConfigFetcher,
-         poller: ConfigPoller,
+         poller: Poller,
          cacheUrl: URL = FileManager.getCacheDirectory().appendingPathComponent("rrc-config.plist"),
          initialCacheContents: [String: String]? = nil) {
         self.fetcher = fetcher
@@ -35,11 +32,13 @@ internal class ConfigCache {
     }
 
     func refreshFromRemote() {
-        self.fetcher.fetch { (result) in
-            guard let config = result?.config else {
-                return print("Config could not be refreshed from remote")
+        self.poller.start {
+            self.fetcher.fetch { (result) in
+                guard let config = result?.config else {
+                    return print("Config could not be refreshed from remote")
+                }
+                self.write(config)
             }
-            self.write(config)
         }
     }
 

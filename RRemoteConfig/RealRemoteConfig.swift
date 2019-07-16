@@ -1,14 +1,14 @@
 internal class RealRemoteConfig {
     static let shared = RealRemoteConfig()
     var environment: Environment
-    var poller: ConfigPoller
+    var poller: Poller
     var apiClient: APIClient
     var fetcher: ConfigFetcher
     var cache: ConfigCache
 
     init() {
         self.environment = Environment()
-        self.poller = ConfigPoller()
+        self.poller = Poller()
         self.apiClient = APIClient()
         self.fetcher = ConfigFetcher(client: apiClient, environment: environment)
         self.cache = ConfigCache(fetcher: fetcher, poller: poller)
