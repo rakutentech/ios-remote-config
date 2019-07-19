@@ -12,3 +12,4 @@ cyclomatic_complexity:
   - 20
 excluded:
   - Pods
+  - RemoteConfigPlayground.playground
