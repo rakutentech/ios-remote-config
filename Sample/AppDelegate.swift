@@ -11,6 +11,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("key: foo, fallback: bar -> val1: \(val1)")
         let val2 = RemoteConfig.getString(key: "asaa", fallback: "oops")
         print("key: asaa, fallback: oops -> val2: \(val2)")
+        print(RemoteConfig.getConfig())
         return true
     }
 }

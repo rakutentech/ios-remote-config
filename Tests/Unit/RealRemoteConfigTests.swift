@@ -11,6 +11,27 @@ class RealRemoteConfigSpec: QuickSpec {
                 expect(RealRemoteConfig.shared.getString("foo", "bar")).to(equal("moo"))
             }
         }
+        describe("getBoolean function") {
+            it("returns a boolean") {
+                RealRemoteConfig.shared.cache = createCacheMock(initialContents: ["foo": "true"])
+
+                expect(RealRemoteConfig.shared.getBoolean("foo", false)).to(beTrue())
+            }
+        }
+        describe("getNumber function") {
+            it("returns a number") {
+                RealRemoteConfig.shared.cache = createCacheMock(initialContents: ["foo": "10"])
+
+                expect(RealRemoteConfig.shared.getNumber("foo", 20)).to(equal(10))
+            }
+        }
+        describe("getConfig function") {
+            it("returns the config") {
+                RealRemoteConfig.shared.cache = createCacheMock(initialContents: ["foo": "bar", "moo": "100"])
+
+                expect(RealRemoteConfig.shared.getConfig()).to(equal(["foo": "bar", "moo": "100"]))
+            }
+        }
         describe("refreshConfig function") {
             it("calls config cache refresh") {
                 RealRemoteConfig.shared.cache = createCacheMock()
