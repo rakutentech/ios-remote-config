@@ -1,6 +1,6 @@
-public class RemoteConfig {
+@objc public class RemoteConfig: NSObject {
 
-    public class func getString(key: String, fallback: String) -> String {
+    @objc public class func getString(key: String, fallback: String) -> String {
         return RealRemoteConfig.shared.getString(key, fallback)
     }
 }
