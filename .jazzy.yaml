@@ -1,0 +1,3 @@
+podspec: RRemoteConfig.podspec
+exclude: RRemoteConfig/Loader.swift
+readme: README.md
