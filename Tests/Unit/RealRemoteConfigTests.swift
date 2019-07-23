@@ -5,28 +5,28 @@ import Nimble
 class RealRemoteConfigSpec: QuickSpec {
     override func spec() {
         describe("getString function") {
-            it("returns a string") {
+            it("retrieves string from the cache for provided key") {
                 RealRemoteConfig.shared.cache = createCacheMock(initialContents: ["foo": "moo"])
 
                 expect(RealRemoteConfig.shared.getString("foo", "bar")).to(equal("moo"))
             }
         }
         describe("getBoolean function") {
-            it("returns a boolean") {
+            it("retrieves boolean from the cache for provided key") {
                 RealRemoteConfig.shared.cache = createCacheMock(initialContents: ["foo": "true"])
 
                 expect(RealRemoteConfig.shared.getBoolean("foo", false)).to(beTrue())
             }
         }
         describe("getNumber function") {
-            it("returns a number") {
+            it("retrieves number from the cache for provided key") {
                 RealRemoteConfig.shared.cache = createCacheMock(initialContents: ["foo": "10"])
 
                 expect(RealRemoteConfig.shared.getNumber("foo", 20)).to(equal(10))
             }
         }
         describe("getConfig function") {
-            it("returns the config") {
+            it("returns the config cache dictionary") {
                 RealRemoteConfig.shared.cache = createCacheMock(initialContents: ["foo": "bar", "moo": "100"])
 
                 expect(RealRemoteConfig.shared.getConfig()).to(equal(["foo": "bar", "moo": "100"]))
