@@ -10,6 +10,9 @@ nesting:
 cyclomatic_complexity:
   - 20
   - 20
+identifier_name:
+  excluded:
+    - id
 excluded:
   - Pods
   - RemoteConfigPlayground.playground

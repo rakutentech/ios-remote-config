@@ -7,13 +7,13 @@ class ConfigFetcherSpec: QuickSpec {
         var dictionary: [String: String]?
         var error: Error?
         var request: URLRequest?
-        override func send<T>(request: URLRequest, decodeAs: T.Type, completionHandler: @escaping (Result<Any, Error>) -> Void) where T: Decodable {
+        override func send<T>(request: URLRequest, decodeAs: T.Type, completionHandler: @escaping (Result<Any, Error>, HTTPURLResponse?) -> Void) where T: Decodable {
             self.request = request
 
             guard let dictionary = dictionary else {
-                return completionHandler(.failure(error ?? NSError(domain: "Test", code: 0, userInfo: nil)))
+                return completionHandler(.failure(error ?? NSError(domain: "Test", code: 0, userInfo: nil)), nil)
             }
-            return completionHandler(.success(ConfigModel(config: dictionary)))
+            return completionHandler(.success(ConfigModel(config: dictionary)), HTTPURLResponse())
         }
     }
     class MockBundleInvalid: EnvironmentSetupProtocol {
@@ -25,9 +25,9 @@ class ConfigFetcherSpec: QuickSpec {
         describe("fetch function") {
             it("will call the send function of the api client passing in a request") {
                 let apiClientMock = APIClientMock()
-                let fetcher = ConfigFetcher(client: apiClientMock, environment: Environment())
+                let fetcher = Fetcher(client: apiClientMock, environment: Environment())
 
-                fetcher.fetch(completionHandler: { (_) in
+                fetcher.fetchConfig(completionHandler: { (_) in
                 })
 
                 expect(apiClientMock.request).toEventually(beAnInstanceOf(URLRequest.self))
@@ -37,9 +37,9 @@ class ConfigFetcherSpec: QuickSpec {
                     var testResult: Any?
                     let apiClientMock = APIClientMock()
                     apiClientMock.dictionary = ["foo": "bar"]
-                    let fetcher = ConfigFetcher(client: apiClientMock, environment: Environment())
+                    let fetcher = Fetcher(client: apiClientMock, environment: Environment())
 
-                    fetcher.fetch(completionHandler: { (result) in
+                    fetcher.fetchConfig(completionHandler: { (result) in
                         testResult = result
                     })
 
@@ -48,9 +48,9 @@ class ConfigFetcherSpec: QuickSpec {
             }
             it("will pass nil in the completion handler when environment is incorrectly configured") {
                 var testResult: Any?
-                let fetcher = ConfigFetcher(client: APIClientMock(), environment: Environment(bundle: MockBundleInvalid()))
+                let fetcher = Fetcher(client: APIClientMock(), environment: Environment(bundle: MockBundleInvalid()))
 
-                fetcher.fetch(completionHandler: { (result) in
+                fetcher.fetchConfig(completionHandler: { (result) in
                     testResult = result
                 })
 
@@ -59,9 +59,9 @@ class ConfigFetcherSpec: QuickSpec {
 
             it("will prefix ras- to the request's subscription key header") {
                 let apiClientMock = APIClientMock()
-                let fetcher = ConfigFetcher(client: apiClientMock, environment: Environment())
+                let fetcher = Fetcher(client: apiClientMock, environment: Environment())
 
-                fetcher.fetch(completionHandler: { (_) in
+                fetcher.fetchConfig(completionHandler: { (_) in
                 })
 
                 expect(apiClientMock.request?.allHTTPHeaderFields!["apiKey"]).toEventually(contain("ras-"))
@@ -71,9 +71,9 @@ class ConfigFetcherSpec: QuickSpec {
                     var testResult: Any?
                     let apiClientMock = APIClientMock()
                     apiClientMock.error = NSError(domain: "Test", code: 123, userInfo: nil)
-                    let fetcher = ConfigFetcher(client: apiClientMock, environment: Environment())
+                    let fetcher = Fetcher(client: apiClientMock, environment: Environment())
 
-                    fetcher.fetch(completionHandler: { (result) in
+                    fetcher.fetchConfig(completionHandler: { (result) in
                         testResult = result
                     })
 

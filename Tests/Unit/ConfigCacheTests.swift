@@ -5,7 +5,7 @@ import Nimble
 class ConfigCacheSpec: QuickSpec {
     override func spec() {
         describe("init function") {
-            let fetcher = ConfigFetcher(client: APIClient(), environment: Environment())
+            let fetcher = Fetcher(client: APIClient(), environment: Environment())
 
             it("sets expected default as the cache url when no cacheUrl param is supplied") {
                 let expectedUrl = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("rrc-config.plist")
@@ -35,7 +35,7 @@ class ConfigCacheSpec: QuickSpec {
             }
         }
         describe("getString function") {
-            let fetcher = ConfigFetcher(client: APIClient(), environment: Environment())
+            let fetcher = Fetcher(client: APIClient(), environment: Environment())
 
             it("returns the value from config when key exists in config") {
                 let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["foo": "bar"])
@@ -64,7 +64,7 @@ class ConfigCacheSpec: QuickSpec {
             }
         }
         describe("getBoolean function") {
-            let fetcher = ConfigFetcher(client: APIClient(), environment: Environment())
+            let fetcher = Fetcher(client: APIClient(), environment: Environment())
 
             it("returns the value from config when key exists") {
                 let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["foo": "true"])
@@ -75,7 +75,7 @@ class ConfigCacheSpec: QuickSpec {
             }
 
             it("returns the fallback when key is not found in config") {
-                let fetcher = ConfigFetcher(client: APIClient(), environment: Environment())
+                let fetcher = Fetcher(client: APIClient(), environment: Environment())
                 let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["moo": "true"])
                 let fallback = false
 
@@ -85,7 +85,7 @@ class ConfigCacheSpec: QuickSpec {
             }
 
             it("returns the fallback when config is empty") {
-                let fetcher = ConfigFetcher(client: APIClient(), environment: Environment())
+                let fetcher = Fetcher(client: APIClient(), environment: Environment())
                 let configCache = ConfigCache(fetcher: fetcher, poller: Poller())
                 let fallback = false
 
@@ -95,7 +95,7 @@ class ConfigCacheSpec: QuickSpec {
             }
         }
         describe("getNumber function") {
-            let fetcher = ConfigFetcher(client: APIClient(), environment: Environment())
+            let fetcher = Fetcher(client: APIClient(), environment: Environment())
 
             it("returns value that can be treated as int from config") {
                 let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["foo": "10"])
@@ -154,7 +154,7 @@ class ConfigCacheSpec: QuickSpec {
             }
         }
         describe("getConfig function") {
-            let fetcher = ConfigFetcher(client: APIClient(), environment: Environment())
+            let fetcher = Fetcher(client: APIClient(), environment: Environment())
 
             it("returns empty dictionary when config is empty") {
                 let configCache = ConfigCache(fetcher: fetcher, poller: Poller())
@@ -173,34 +173,89 @@ class ConfigCacheSpec: QuickSpec {
             }
         }
         describe("refreshFromRemote function") {
-            class FetcherMock: ConfigFetcher {
-                var fetcherCalledNumTimes = 0
-                var fetchedConfig = ConfigModel(config: ["": ""])
+            let fetcher = FetcherMock(client: APIClient(), environment: Environment())
+            let configCache = ConfigCache(fetcher: fetcher, poller: Poller())
+            let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("foo")
+            let verifier = VerifierMock()
 
-                override func fetch(completionHandler: @escaping (ConfigModel?) -> Void) {
-                    fetcherCalledNumTimes += 1
-                    completionHandler(fetchedConfig)
+            beforeEach {
+                do {
+                    try FileManager.default.removeItem(at: url)
+                } catch {
                 }
             }
 
             it("calls the fetcher's fetch function exactly once") {
-                let fetcher = FetcherMock(client: APIClient(), environment: Environment())
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller())
-
+                fetcher.fetchConfigCalledNumTimes = 0
                 configCache.refreshFromRemote()
 
-                expect(fetcher.fetcherCalledNumTimes).to(equal(1))
+                expect(fetcher.fetchConfigCalledNumTimes).to(equal(1))
             }
 
-            it("writes the fetched config to the cache file") {
-                let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("foo")
-                let fetcher = FetcherMock(client: APIClient(), environment: Environment())
-                fetcher.fetchedConfig = ConfigModel(config: ["foo": "bar"])
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller())
+            describe("when the verification key is found locally") {
+                fetcher.fetchedConfig = ConfigModel(config: ["foo": "bar"], keyId: "aKey")
+                fetcher.fetchedConfig.signature = "aSig"
+                let configCache = ConfigCache(fetcher: fetcher,
+                                              poller: Poller(),
+                                              cacheUrl: url,
+                                              keyStore: KeyStoreMock(contents: ["aKey": "1234"]),
+                                              verifier: verifier)
 
-                configCache.refreshFromRemote()
+                it("writes the fetched config when verification succeeds") {
+                    verifier.verifyOK = true
 
-                expect(NSDictionary(contentsOf: url)).to(equal(["foo": "bar"]))
+                    configCache.refreshFromRemote()
+
+                    let expected: [String: Any] = [
+                        "config": ["foo": "bar"],
+                        "signature": "aSig",
+                        "keyId": "aKey"
+                    ]
+                    expect(NSDictionary(contentsOf: configCache.cacheUrl)).toEventually(equal(expected as NSDictionary), timeout: 2)
+                }
+
+                it("does not write the fetched config when verification fails") {
+                    let expected: [AnyHashable: Any] = [:]
+                    NSDictionary(dictionary: expected).write(to: url, atomically: true)
+                    verifier.verifyOK = false
+                    var cacheContents: NSDictionary?
+
+                    configCache.refreshFromRemote()
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                        cacheContents = NSDictionary(contentsOf: configCache.cacheUrl)
+                    })
+
+                    expect(cacheContents).toEventually(equal(expected as NSDictionary), timeout: 1.0)
+                }
+            }
+            describe("when the verification key is not found locally") {
+                fetcher.fetchedConfig = ConfigModel(config: ["foo": "bar"], keyId: "aKey")
+                fetcher.fetchedConfig.signature = "aSig"
+                let keyStore = KeyStoreMock(contents: [:])
+                let configCache = ConfigCache(fetcher: fetcher,
+                                              poller: Poller(),
+                                              cacheUrl: url,
+                                              keyStore: keyStore,
+                                              verifier: verifier)
+
+                beforeEach {
+                    keyStore.store = [:]
+                    fetcher.fetchKeyCalledNumTimes = 0
+                }
+                it("calls the fetch key function") {
+                    configCache.refreshFromRemote()
+
+                    expect(fetcher.fetchKeyCalledNumTimes).to(equal(1))
+                }
+
+                it("adds the key after fetching it") {
+                    fetcher.fetchedKey = KeyModel(id: "aKey", key: "123", createdAt: "")
+
+                    configCache.refreshFromRemote()
+
+                    expect(keyStore.store?["aKey"]).toEventually(equal("123"), timeout: 2.0)
+                }
             }
         }
     }

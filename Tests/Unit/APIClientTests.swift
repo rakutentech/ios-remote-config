@@ -33,7 +33,7 @@ class APIClientSpec: QuickSpec {
 
                 it("will pass a result to completion handler with expected value") {
                     let sessionMock = SessionMock(json: ["foo": "bar"])
-                    APIClient(session: sessionMock).send(request: URLRequest(url: URL(string: "https://test.com")!), decodeAs: TestStruct.self, completionHandler: { (result) in
+                    APIClient(session: sessionMock).send(request: URLRequest(url: URL(string: "https://test.com")!), decodeAs: TestStruct.self, completionHandler: { (result, _) in
                         switch result {
                         case .success(let obj):
                             testResult = obj as? TestStruct ?? TestStruct(foo: "foo")
@@ -50,7 +50,7 @@ class APIClientSpec: QuickSpec {
 
                 it("will pass an error to completion handler with expected code") {
                     let sessionMock = SessionMock(json: ["code": 1, "message": "error message"])
-                    APIClient(session: sessionMock).send(request: URLRequest(url: URL(string: "https://test.com")!), decodeAs: TestStruct.self, completionHandler: { (result) in
+                    APIClient(session: sessionMock).send(request: URLRequest(url: URL(string: "https://test.com")!), decodeAs: TestStruct.self, completionHandler: { (result, _) in
                         switch result {
                         case .success:
                             break
@@ -64,7 +64,7 @@ class APIClientSpec: QuickSpec {
 
                 it("will pass an error to completion handler with expected message") {
                     let sessionMock = SessionMock(json: ["code": 1, "message": "error message"])
-                    APIClient(session: sessionMock).send(request: URLRequest(url: URL(string: "https://test.com")!), decodeAs: TestStruct.self, completionHandler: { (result) in
+                    APIClient(session: sessionMock).send(request: URLRequest(url: URL(string: "https://test.com")!), decodeAs: TestStruct.self, completionHandler: { (result, _) in
                         switch result {
                         case .success:
                             break
@@ -80,7 +80,7 @@ class APIClientSpec: QuickSpec {
                 it("will pass a non-nil error to completion handler") {
                     var testError: NSError = NSError.init(domain: "Test", code: 0, userInfo: nil)
                     let sessionMock = SessionMock(json: ["foo": "bar"])
-                    APIClient(session: sessionMock).send(request: URLRequest(url: URL(string: "https://test.com")!), decodeAs: TestStruct.self, completionHandler: { (result) in
+                    APIClient(session: sessionMock).send(request: URLRequest(url: URL(string: "https://test.com")!), decodeAs: TestStruct.self, completionHandler: { (result, _) in
                         switch result {
                         case .success:
                             break
@@ -97,7 +97,7 @@ class APIClientSpec: QuickSpec {
 
                 it("will pass an error with code set to server status code to completion handler and error is nil") {
                     let sessionMock = SessionMock(json: nil, statusCode: 400)
-                    APIClient(session: sessionMock).send(request: URLRequest(url: URL(string: "https://test.com")!), decodeAs: TestStruct.self, completionHandler: { (result) in
+                    APIClient(session: sessionMock).send(request: URLRequest(url: URL(string: "https://test.com")!), decodeAs: TestStruct.self, completionHandler: { (result, _) in
                         switch result {
                         case .success:
                             break
@@ -111,7 +111,7 @@ class APIClientSpec: QuickSpec {
 
                 it("will pass any system error to completion handler even when response received") {
                     let sessionMock = SessionMock(json: nil, error: NSError(domain: "Test", code: 123, userInfo: nil))
-                    APIClient(session: sessionMock).send(request: URLRequest(url: URL(string: "https://test.com")!), decodeAs: TestStruct.self, completionHandler: { (result) in
+                    APIClient(session: sessionMock).send(request: URLRequest(url: URL(string: "https://test.com")!), decodeAs: TestStruct.self, completionHandler: { (result, _) in
                         switch result {
                         case .success:
                             break

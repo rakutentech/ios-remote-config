@@ -17,28 +17,28 @@ internal class APIClient {
         self.session = session
     }
 
-    func send<T>(request: URLRequest, decodeAs: T.Type, completionHandler: @escaping (Result<Any, Error>) -> Void) where T: Decodable {
+    func send<T>(request: URLRequest, decodeAs: T.Type, completionHandler: @escaping (Result<Any, Error>, _ httpResponse: HTTPURLResponse?) -> Void) where T: Decodable {
 
         session.startTask(with: request) { (data, response, error) in
+            let httpResponse = response as? HTTPURLResponse
             guard let data = data else {
                 if let error = error {
-                    return completionHandler(.failure(error))
+                    return completionHandler(.failure(error), httpResponse)
                 } else {
-                    let httpResponse = response as? HTTPURLResponse
                     let serverError = NSError.serverError(code: httpResponse?.statusCode ?? 0, message: "Unspecified server error occurred")
-                    return completionHandler(.failure(serverError))
+                    return completionHandler(.failure(serverError), httpResponse)
                 }
             }
             let decoder = JSONDecoder()
             do {
                 let config = try decoder.decode(decodeAs, from: data)
-                completionHandler(.success(config))
+                completionHandler(.success(config), httpResponse)
             } catch let parseError {
                 do {
                     let errorModel = try decoder.decode(APIError.self, from: data)
-                    completionHandler(.failure(NSError.serverError(code: errorModel.code, message: errorModel.message)))
+                    completionHandler(.failure(NSError.serverError(code: errorModel.code, message: errorModel.message)), httpResponse)
                 } catch {
-                    completionHandler(.failure(parseError))
+                    completionHandler(.failure(parseError), httpResponse)
                 }
             }
         }

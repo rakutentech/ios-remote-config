@@ -3,14 +3,14 @@ internal class RealRemoteConfig {
     var environment: Environment
     var poller: Poller
     var apiClient: APIClient
-    var fetcher: ConfigFetcher
+    var fetcher: Fetcher
     var cache: ConfigCache
 
     init() {
         self.environment = Environment()
         self.poller = Poller()
         self.apiClient = APIClient()
-        self.fetcher = ConfigFetcher(client: apiClient, environment: environment)
+        self.fetcher = Fetcher(client: apiClient, environment: environment)
         self.cache = ConfigCache(fetcher: fetcher, poller: poller)
     }
 

@@ -21,6 +21,8 @@ platform :ios do
       code_coverage: true,
       output_types: 'json-compilation-database,html,junit',
       output_files: 'compile_commands.json,report.html,report.junit')
+
+    coverage
   end
 
   desc "Set up environment"
@@ -37,7 +39,7 @@ platform :ios do
                          value: ENV['RRC_CONFIG_API_ENDPOINT'] || "https://config-endpoint.com")
   end
 
-  desc "Generate code coverage locally"
+  desc "Generate code coverage"
   lane :coverage do |options|
     xcov(
       workspace: 'RRemoteConfig.xcworkspace',
