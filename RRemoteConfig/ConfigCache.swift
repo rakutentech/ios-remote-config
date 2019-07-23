@@ -3,6 +3,7 @@ internal class ConfigCache {
     let poller: Poller
     let cacheUrl: URL
     private var activeConfig: ConfigModel? = ConfigModel(config: [:])
+    private var numberFormatter: NumberFormatter
 
     init(fetcher: ConfigFetcher,
          poller: Poller,
@@ -11,6 +12,7 @@ internal class ConfigCache {
         self.fetcher = fetcher
         self.poller = poller
         self.cacheUrl = cacheUrl
+        self.numberFormatter = NumberFormatter()
         if let initialCacheContents = initialCacheContents {
             self.activeConfig = ConfigModel(config: initialCacheContents)
         }
@@ -29,6 +31,26 @@ internal class ConfigCache {
             return fallback
         }
         return config[key] ?? fallback
+    }
+
+    func getBoolean(_ key: String, _ fallback: Bool) -> Bool {
+        guard let config = activeConfig?.config, let value = config[key] else {
+            return fallback
+        }
+        return (value as NSString).boolValue
+    }
+
+    func getNumber(_ key: String, _ fallback: NSNumber) -> NSNumber {
+        guard
+            let config = activeConfig?.config,
+            let value = config[key] else {
+            return fallback
+        }
+        return numberFormatter.number(from: value) ?? fallback
+    }
+
+    func getConfig() -> [String: String] {
+        return activeConfig?.config ?? [:]
     }
 
     func refreshFromRemote() {

@@ -2,8 +2,8 @@ line_length:
   - 200 # warning
   - 300 # error
 function_body_length:
-  - 100
-  - 100
+  - 200
+  - 200
 nesting:
   - 5
   - 5

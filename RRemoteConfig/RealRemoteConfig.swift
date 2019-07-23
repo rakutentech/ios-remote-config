@@ -18,6 +18,18 @@ internal class RealRemoteConfig {
         return cache.getString(key, fallback)
     }
 
+    func getBoolean(_ key: String, _ fallback: Bool) -> Bool {
+        return cache.getBoolean(key, fallback)
+    }
+
+    func getNumber(_ key: String, _ fallback: NSNumber) -> NSNumber {
+        return cache.getNumber(key, fallback)
+    }
+
+    func getConfig() -> [String: String] {
+        return cache.getConfig()
+    }
+
     func refreshConfig() {
         cache.refreshFromRemote()
     }
