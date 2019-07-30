@@ -10,12 +10,23 @@ import XCTest
 class VerifierSpec: QuickSpec {
     override func spec() {
         let verifier = Verifier()
+        let originalPayload = ["testKey": "test_value"]
+        let signature = "MEUCIQCHJfSffJ+yjuCAvH3HKprbSn3XqUtZm9a+6+w2GILfywIgOkpFyaPNyQReaylbuhegQpPS+uVDwczbUsKZtaHcSnw="
+        let key = "BI2zZr56ghnMLXBMeC4bkIVg6zpFD2ICIS7V6cWo8p8LkibuershO+Hd5ru6oBFLlUk6IFFOIVfHKiOenHLBNIY="
 
-        it("should verify the signature") {
-            let verified = verifier.verify(signatureBase64: "MEUCIHRXIgQhyASpyCP1Lg0ZSn2/bUbTq6U7jpKBa9Ow/1OTAiEA4jAq48uDgNl7UM7LmxhiRhPPNnTolokScTq5ijbp5fU=",
-                                           dictionary: ["testKey": "test_value"],
-                                           keyBase64: "BI2zZr56ghnMLXBMeC4bkIVg6zpFD2ICIS7V6cWo8p8LkibuershO+Hd5ru6oBFLlUk6IFFOIVfHKiOenHLBNIY=")
+        it("should verify the signature of the original payload") {
+            let verified = verifier.verify(signatureBase64: signature,
+                                           dictionary: originalPayload,
+                                           keyBase64: key)
             expect(verified).to(beTrue())
+        }
+
+        it("should not verify the signature of a modified payload") {
+            let modifiedPayload = ["testKey": "another_value"]
+            let verified = verifier.verify(signatureBase64: signature,
+                                           dictionary: modifiedPayload,
+                                           keyBase64: key)
+            expect(verified).to(beFalse())
         }
     }
 }
