@@ -9,8 +9,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         let val1 = RemoteConfig.getString(key: "foo", fallback: "bar")
         print("key: foo, fallback: bar -> val1: \(val1)")
-        let val2 = RemoteConfig.getString(key: "asaa", fallback: "oops")
-        print("key: asaa, fallback: oops -> val2: \(val2)")
+        let val2 = RemoteConfig.getString(key: "key", fallback: "oops")
+        print("key: key, fallback: oops -> val2: \(val2)")
         print(RemoteConfig.getConfig())
         return true
     }

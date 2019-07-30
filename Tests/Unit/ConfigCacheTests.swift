@@ -26,12 +26,67 @@ class ConfigCacheSpec: QuickSpec {
             it("when cache file has contents the config is empty immediately after init returns") {
                 let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("foo")
                 NSDictionary(dictionary: ["foo": "bar"]).write(to: url, atomically: true)
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller())
+                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), cacheUrl: url)
                 let fallback = "not found"
 
                 let value = configCache.getString("foo", fallback)
 
                 expect(value).to(equal(fallback))
+            }
+            describe("set active config from cached config") {
+                let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("foo")
+                let verifier = VerifierMock()
+                let fetcher = Fetcher(client: APIClient(), environment: Environment())
+
+                beforeEach {
+                    NSDictionary(dictionary:
+                        ["config":
+                            [
+                                "foo": "bar"
+                            ],
+                         "keyId": "1234",
+                         "signature": "sigfoo"
+                        ]).write(to: url, atomically: true)
+                }
+
+                describe("key is found in key store") {
+                    let keyStore = KeyStoreMock(contents: ["1234": "ABCDE"])
+
+                    it("sets the active config when verification succeeds") {
+                        verifier.verifyOK = true
+
+                        let configCache = ConfigCache(fetcher: fetcher,
+                                                      poller: Poller(),
+                                                      cacheUrl: url,
+                                                      keyStore: keyStore,
+                                                      verifier: verifier)
+
+                        expect(configCache.getConfig() as NSDictionary).toEventually(equal(["foo": "bar"] as NSDictionary), timeout: 1)
+                    }
+
+                    it("does not set the active config when verification fails") {
+                        verifier.verifyOK = false
+
+                        let configCache = ConfigCache(fetcher: fetcher,
+                                                      poller: Poller(),
+                                                      cacheUrl: url,
+                                                      keyStore: keyStore,
+                                                      verifier: verifier)
+
+                        expect(configCache.getConfig() as NSDictionary).toEventually(equal([:] as NSDictionary), timeout: 1)
+                    }
+                }
+                describe("key is not found in key store") {
+                    it("does not set the active config") {
+                        let configCache = ConfigCache(fetcher: fetcher,
+                                                      poller: Poller(),
+                                                      cacheUrl: url,
+                                                      keyStore: KeyStoreMock(contents: [:]),
+                                                      verifier: verifier)
+
+                        expect(configCache.getConfig() as NSDictionary).toEventually(equal([:] as NSDictionary), timeout: 1)
+                    }
+                }
             }
         }
         describe("getString function") {

@@ -20,6 +20,9 @@ internal class Verifier {
                                              objectData as CFData,
                                              signatureData as CFData,
                                              &error)
+        if error != nil {
+            print(error as Any)
+        }
         return verified
     }
 

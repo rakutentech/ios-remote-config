@@ -35,14 +35,12 @@ internal class ConfigCache {
                 var configModel = ConfigModel(config: configDic, keyId: dictionary["keyId"] as? String ?? "")
                 configModel.signature = dictionary["signature"] as? String
 
-                self.verifyContents(model: configModel, resultHandler: { (verified) in
-                    if verified {
-                        print("Set active config to cached contents")
-                        self.activeConfig = configModel
-                    } else {
-                        print("Dictionary contents verification failed")
-                    }
-                })
+                if self.verifyContents(model: configModel) {
+                    print("Set active config to cached contents")
+                    self.activeConfig = configModel
+                } else {
+                    print("Dictionary contents verification failed")
+                }
             }
         }
     }
@@ -89,9 +87,20 @@ extension FileManager {
 
 // MARK: Payload signature verification
 extension ConfigCache {
-    func verifyContents(model: ConfigModel, resultHandler: @escaping (Bool) -> Void ) {
+    // synchronous verification with local key store
+    func verifyContents(model: ConfigModel) -> Bool {
+        guard let key = keyStore.key(for: model.keyId),
+            let signature = model.signature else {
+            return false
+        }
+        return self.verifier.verify(signatureBase64: signature,
+                                    dictionary: model.config,
+                                    keyBase64: key)
+    }
 
-        // Fetch key from backend if not found in key store
+    // asynchronous verification - fetches key from backend if key is not
+    // found in local key store
+    func verifyContents(model: ConfigModel, resultHandler: @escaping (Bool) -> Void ) {
         if let key = keyStore.key(for: model.keyId) {
             let verified = self.verifier.verify(signatureBase64: model.signature ?? "",
                                                 dictionary: model.config,
