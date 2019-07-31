@@ -33,13 +33,13 @@ class EnvironmentSpec: QuickSpec {
             let appId = "12345"
             let endpoint = "https://endpoint.com"
             let subKey = "ABCDE"
-            it("will return a url with format <endpoint>/app/<app-id>/config") {
+            it("will return a url with format <endpoint>") {
                 mockBundle.endpoint = endpoint
                 mockBundle.appId = appId
 
                 let environment = Environment(bundle: mockBundle)
 
-                expect(environment.url?.absoluteString).to(equal("\(endpoint)/app/\(appId)/config"))
+                expect(environment.configUrl?.absoluteString).to(equal("\(endpoint)/app/\(appId)/config"))
             }
             it("has the expected subscription key") {
                 mockBundle.subKey = subKey
@@ -61,7 +61,7 @@ class EnvironmentSpec: QuickSpec {
             let mockBundleInvalid = MockBundleInvalid()
             it("will return a nil url") {
                 let environment = Environment(bundle: mockBundleInvalid)
-                expect(environment.url?.absoluteString).to(beNil())
+                expect(environment.configUrl?.absoluteString).to(beNil())
             }
             it("will return a nil subscription key") {
                 let environment = Environment(bundle: mockBundleInvalid)

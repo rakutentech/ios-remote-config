@@ -10,12 +10,19 @@ extension Bundle: EnvironmentSetupProtocol {
 
 internal class Environment {
     let bundle: EnvironmentSetupProtocol
-    var url: URL? {
-        guard let appId = bundle.value(for: "RASApplicationIdentifier"), let endpointUrlString = bundle.value(for: "RRCConfigAPIEndpoint") else {
-            print("Ensure RASApplicationIdentifier and RRCConfigAPIEndpoint values in plist are valid")
+    private var baseUrl: URL? {
+        guard let endpointUrlString = bundle.value(for: "RRCConfigAPIEndpoint") else {
+            print("Ensure RRCConfigAPIEndpoint value in plist is valid")
             return nil
         }
-        return URL(string: "\(endpointUrlString)/app/\(appId)/config")
+        return URL(string: "\(endpointUrlString)")
+    }
+    var configUrl: URL? {
+        guard let appId = bundle.value(for: "RASApplicationIdentifier") else {
+            print("Ensure RASApplicationIdentifier value in plist is valid")
+            return nil
+        }
+        return baseUrl?.appendingPathComponent("/app/\(appId)/config")
     }
     var subscriptionKey: String {
         return bundle.value(for: "RASProjectSubscriptionKey") ?? ""
@@ -23,5 +30,9 @@ internal class Environment {
 
     init(bundle: EnvironmentSetupProtocol = Bundle.main) {
         self.bundle = bundle
+    }
+
+    func keyUrl(with keyId: String) -> URL? {
+        return baseUrl?.appendingPathComponent("/keys/\(keyId)")
     }
 }

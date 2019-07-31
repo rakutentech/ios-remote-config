@@ -1,15 +1,17 @@
+disabled_rules: # rule identifiers to exclude from running
+  - nesting
 line_length:
   - 200 # warning
   - 300 # error
 function_body_length:
   - 200
   - 200
-nesting:
-  - 5
-  - 5
 cyclomatic_complexity:
   - 20
   - 20
+identifier_name:
+  excluded:
+    - id
 excluded:
   - Pods
   - RemoteConfigPlayground.playground
