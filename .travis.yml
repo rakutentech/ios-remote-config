@@ -4,10 +4,11 @@ xcode_scheme: Tests
 osx_image: xcode10.2
 
 before_install:
+- gem install xcov
 - gem update fastlane cocoapods xcov --no-document
 - pod repo update
 
-script: fastlane ci
+script: fastlane ci && fastlane coverage
 
 # FIXME: codecov cannot read the Xcode 10 generated code coverage file
 #after_success:
