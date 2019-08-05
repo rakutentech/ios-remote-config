@@ -21,6 +21,8 @@ platform :ios do
       code_coverage: true,
       output_types: 'json-compilation-database,html,junit',
       output_files: 'compile_commands.json,report.html,report.junit')
+
+    coverage
   end
 
   desc "Set up environment"
