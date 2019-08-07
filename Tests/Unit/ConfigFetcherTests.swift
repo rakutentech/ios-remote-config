@@ -16,11 +16,6 @@ class ConfigFetcherSpec: QuickSpec {
             return completionHandler(.success(ConfigModel(config: dictionary)), HTTPURLResponse())
         }
     }
-    class MockBundleInvalid: EnvironmentSetupProtocol {
-        func value(for key: String) -> String? {
-            return nil
-        }
-    }
     override func spec() {
         describe("fetch function") {
             it("will call the send function of the api client passing in a request") {
@@ -48,7 +43,9 @@ class ConfigFetcherSpec: QuickSpec {
             }
             it("will pass nil in the completion handler when environment is incorrectly configured") {
                 var testResult: Any?
-                let fetcher = Fetcher(client: APIClientMock(), environment: Environment(bundle: MockBundleInvalid()))
+                let bundleMock = BundleMock()
+                bundleMock.mockEndpoint = "12345"
+                let fetcher = Fetcher(client: APIClientMock(), environment: Environment(bundle: bundleMock))
 
                 fetcher.fetchConfig(completionHandler: { (result) in
                     testResult = result

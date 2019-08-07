@@ -13,7 +13,9 @@ internal class Fetcher {
             return completionHandler(nil)
         }
         var request = URLRequest(url: url)
-        request.addValue("ras-\(environment.subscriptionKey)", forHTTPHeaderField: "apiKey")
+        request.addHeader("apiKey", "ras-\(environment.subscriptionKey)")
+        request.setExtraHeaders(from: environment)
+
         apiClient.send(request: request, decodeAs: ConfigModel.self) { (result, response) in
             switch result {
             case .success(let resultConfig):
@@ -21,7 +23,7 @@ internal class Fetcher {
                 config?.signature = response?.allHeaderFields["Signature"] as? String
                 completionHandler(config)
             case .failure(let error):
-                print("Error: ", error)
+                print("Config fetch \(String(describing: request.url)) result is error \(error.localizedDescription) and response \(String(describing: response))")
                 completionHandler(nil)
             }
         }
@@ -32,13 +34,14 @@ internal class Fetcher {
             return completionHandler(nil)
         }
         var request = URLRequest(url: url)
-        request.addValue("ras-\(environment.subscriptionKey)", forHTTPHeaderField: "apiKey")
-        apiClient.send(request: request, decodeAs: KeyModel.self) { (result, _) in
+        request.addHeader("apiKey", "ras-\(environment.subscriptionKey)")
+
+        apiClient.send(request: request, decodeAs: KeyModel.self) { (result, response) in
             switch result {
             case .success(let keyModel):
                 completionHandler(keyModel as? KeyModel)
             case .failure(let error):
-                print("Error: ", error)
+                print("Key fetch \(String(describing: request.url)) result is error \(error.localizedDescription) and response \(String(describing: response))")
                 completionHandler(nil)
             }
         }
