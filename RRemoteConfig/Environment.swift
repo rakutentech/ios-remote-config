@@ -1,11 +1,10 @@
 internal protocol EnvironmentSetupProtocol {
+    var valueNotFound: String { get }
     func value(for key: String) -> String?
-}
-
-extension Bundle: EnvironmentSetupProtocol {
-    func value(for key: String) -> String? {
-        return self.object(forInfoDictionaryKey: key) as? String
-    }
+    func deviceModel() -> String
+    func deviceOsVersion() -> String
+    func sdkName() -> String
+    func sdkVersion() -> String
 }
 
 internal class Environment {
@@ -25,7 +24,28 @@ internal class Environment {
         return baseUrl?.appendingPathComponent("/app/\(appId)/config")
     }
     var subscriptionKey: String {
-        return bundle.value(for: "RASProjectSubscriptionKey") ?? ""
+        return bundle.value(for: "RASProjectSubscriptionKey") ?? bundle.valueNotFound
+    }
+    var appId: String {
+        return bundle.value(for: "CFBundleIdentifier" as String) ?? bundle.valueNotFound
+    }
+    var appName: String {
+        return bundle.value(for: "CFBundleDisplayName" as String) ?? bundle.valueNotFound
+    }
+    var appVersion: String {
+        return bundle.value(for: "CFBundleShortVersionString" as String) ?? bundle.valueNotFound
+    }
+    var deviceModel: String {
+        return bundle.deviceModel()
+    }
+    var deviceOsVersion: String {
+        return bundle.deviceOsVersion()
+    }
+    var sdkName: String {
+        return bundle.sdkName()
+    }
+    var sdkVersion: String {
+        return bundle.sdkVersion()
     }
 
     init(bundle: EnvironmentSetupProtocol = Bundle.main) {

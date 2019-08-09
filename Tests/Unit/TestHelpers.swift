@@ -1,5 +1,57 @@
 @testable import RRemoteConfig
 
+class BundleMock: EnvironmentSetupProtocol {
+    var mockAppId: String?
+    var mockAppName: String?
+    var mockAppVersion: String?
+    var mockEndpoint: String?
+    var mockSubKey: String?
+    var mockDeviceModel: String?
+    var mockOsVersion: String?
+    var mockSdkName: String?
+    var mockSdkVersion: String?
+    var mockNotFound: String?
+
+    func value(for key: String) -> String? {
+        switch key {
+        case "RASApplicationIdentifier":
+            return mockAppId
+        case "RRCConfigAPIEndpoint":
+            return mockEndpoint
+        case "RASProjectSubscriptionKey":
+            return mockSubKey
+        case "CFBundleIdentifier":
+            return mockAppId
+        case "CFBundleDisplayName":
+            return mockAppName
+        case "CFBundleShortVersionString":
+            return mockAppVersion
+        default:
+            return nil
+        }
+    }
+
+    var valueNotFound: String {
+        return mockNotFound ?? ""
+    }
+
+    func deviceModel() -> String {
+        return mockDeviceModel ?? valueNotFound
+    }
+
+    func deviceOsVersion() -> String {
+        return mockOsVersion ?? valueNotFound
+    }
+
+    func sdkName() -> String {
+        return mockSdkName ?? valueNotFound
+    }
+
+    func sdkVersion() -> String {
+        return mockSdkVersion ?? valueNotFound
+    }
+}
+
 class CacheMock: ConfigCache {
     var refreshCalled = false
 

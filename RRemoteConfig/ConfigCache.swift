@@ -39,7 +39,7 @@ internal class ConfigCache {
                     print("Set active config to cached contents")
                     self.activeConfig = configModel
                 } else {
-                    print("Dictionary contents verification failed")
+                    print("Cached dictionary contents failed verification")
                 }
             }
         }
@@ -60,7 +60,7 @@ internal class ConfigCache {
                         ]
                         self.write(dictionary)
                     } else {
-                        print("Dictionary contents verification failed")
+                        print("Fetched dictionary contents failed verification")
                     }
                 })
             }

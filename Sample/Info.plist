@@ -20,12 +20,12 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>RRCConfigAPIEndpoint</key>
-	<string>https://performance-endpoint.com</string>
-	<key>RASProjectSubscriptionKey</key>
-	<string>SUBSCRIPTION_KEY</string>
 	<key>RASApplicationIdentifier</key>
 	<string>APPLICATION_IDENTIFIER</string>
+	<key>RASProjectSubscriptionKey</key>
+	<string>SUBSCRIPTION_KEY</string>
+	<key>RRCConfigAPIEndpoint</key>
+	<string>https://performance-endpoint.com</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
