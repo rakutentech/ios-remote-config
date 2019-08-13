@@ -9,6 +9,7 @@ internal protocol EnvironmentSetupProtocol {
 
 internal class Environment {
     let bundle: EnvironmentSetupProtocol
+    static let etagKey = "com.rakuten.tech.RemoteConfig.payloadETag"
     private var baseUrl: URL? {
         guard let endpointUrlString = bundle.value(for: "RRCConfigAPIEndpoint") else {
             Logger.e("Ensure RRCConfigAPIEndpoint value in plist is valid")
@@ -46,6 +47,14 @@ internal class Environment {
     }
     var sdkVersion: String {
         return bundle.sdkVersion()
+    }
+    var etag: String? {
+        get {
+            return UserDefaults.standard.string(forKey: Environment.etagKey)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Environment.etagKey)
+        }
     }
 
     init(bundle: EnvironmentSetupProtocol = Bundle.main) {

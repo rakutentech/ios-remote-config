@@ -3,19 +3,6 @@ import Nimble
 @testable import RRemoteConfig
 
 class ConfigFetcherSpec: QuickSpec {
-    class APIClientMock: APIClient {
-        var dictionary: [String: String]?
-        var error: Error?
-        var request: URLRequest?
-        override func send<T>(request: URLRequest, decodeAs: T.Type, completionHandler: @escaping (Result<Any, Error>, HTTPURLResponse?) -> Void) where T: Decodable {
-            self.request = request
-
-            guard let dictionary = dictionary else {
-                return completionHandler(.failure(error ?? NSError(domain: "Test", code: 0, userInfo: nil)), nil)
-            }
-            return completionHandler(.success(ConfigModel(config: dictionary)), HTTPURLResponse())
-        }
-    }
     override func spec() {
         describe("fetch function") {
             let bundleMock = BundleMock()
@@ -34,20 +21,7 @@ class ConfigFetcherSpec: QuickSpec {
 
                 expect(apiClientMock.request).toEventually(beAnInstanceOf(URLRequest.self))
             }
-            context("when valid config model is received as the result from the api client") {
-                it("will pass the config in the completion handler") {
-                    var testResult: Any?
-                    let apiClientMock = APIClientMock()
-                    apiClientMock.dictionary = ["foo": "bar"]
-                    let fetcher = Fetcher(client: apiClientMock, environment: Environment())
 
-                    fetcher.fetchConfig(completionHandler: { (result) in
-                        testResult = result
-                    })
-
-                    expect((testResult as? ConfigModel)?.config).toEventually(equal(["foo": "bar"]))
-                }
-            }
             it("will pass nil in the completion handler when environment is incorrectly configured") {
                 var testResult: Any?
                 bundleMock.mockEndpoint = "12345"
@@ -65,11 +39,32 @@ class ConfigFetcherSpec: QuickSpec {
                 bundleMock.mockSubKey = "my-subkey"
                 let fetcher = Fetcher(client: apiClientMock, environment: Environment(bundle: bundleMock))
 
-                fetcher.fetchConfig(completionHandler: { (_) in
-                    print(apiClientMock.request?.allHTTPHeaderFields)
+                fetcher.fetchConfig(completionHandler: {_ in
                 })
 
                 expect(apiClientMock.request?.allHTTPHeaderFields!["apiKey"]).toEventually(equal("ras-my-subkey"))
+            }
+
+            it("will add the If-None-Match header if Etag was saved") {
+                let apiClientMock = APIClientMock()
+                UserDefaults.standard.set("my-etag", forKey: Environment.etagKey)
+                let fetcher = Fetcher(client: apiClientMock, environment: Environment(bundle: bundleMock))
+
+                fetcher.fetchConfig(completionHandler: { (_) in
+                })
+
+                expect(apiClientMock.request?.allHTTPHeaderFields!["If-None-Match"]).toEventually(equal("my-etag"))
+            }
+
+            it("will not add the If-None-Match header if Etag cannot be found") {
+                let apiClientMock = APIClientMock()
+                UserDefaults.standard.set(nil, forKey: Environment.etagKey)
+                let fetcher = Fetcher(client: apiClientMock, environment: Environment(bundle: bundleMock))
+
+                fetcher.fetchConfig(completionHandler: { (_) in
+                })
+
+                expect(apiClientMock.request?.allHTTPHeaderFields!["If-None-Match"]).toEventually(beNil())
             }
 
             it("will add the app id header") {
@@ -147,6 +142,47 @@ class ConfigFetcherSpec: QuickSpec {
                 })
 
                 expect(apiClientMock.request?.allHTTPHeaderFields!["ras-sdk-version"]).toEventually(equal("1.2.3"))
+            }
+
+            context("when valid config model is received as the result from the api client") {
+                it("will set the config dictionary in the result passed to the completion handler") {
+                    var testResult: Any?
+                    let apiClientMock = APIClientMock()
+                    apiClientMock.dictionary = ["foo": "bar"]
+                    let fetcher = Fetcher(client: apiClientMock, environment: Environment())
+
+                    fetcher.fetchConfig(completionHandler: { (result) in
+                        testResult = result
+                    })
+
+                    expect((testResult as? ConfigModel)?.config).toEventually(equal(["foo": "bar"]))
+                }
+
+                it("will set the signature in the result passed to the completion handler") {
+                    var testResult: Any?
+                    let apiClientMock = APIClientMock()
+                    apiClientMock.dictionary = ["foo": "bar"]
+                    apiClientMock.headers = ["Signature": "a-sig"]
+                    let fetcher = Fetcher(client: apiClientMock, environment: Environment())
+
+                    fetcher.fetchConfig(completionHandler: { (result) in
+                        testResult = result
+                    })
+
+                    expect((testResult as? ConfigModel)?.signature).toEventually(equal("a-sig"))
+                }
+
+                it("will save the etag to user defaults") {
+                    let apiClientMock = APIClientMock()
+                    apiClientMock.dictionary = ["foo": "bar"]
+                    apiClientMock.headers = ["Etag": "an-etag"]
+                    let fetcher = Fetcher(client: apiClientMock, environment: Environment())
+
+                    fetcher.fetchConfig(completionHandler: { (_) in
+                    })
+
+                    expect(UserDefaults.standard.string(forKey: Environment.etagKey)).toEventually(equal("an-etag"))
+                }
             }
 
             context("when error is received as the result from the api client") {

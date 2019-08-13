@@ -45,22 +45,24 @@ internal class ConfigCache {
 
     func refreshFromRemote() {
         self.poller.start {
-            self.fetcher.fetchConfig { (result) in
-                guard let configModel = result else {
-                    return Logger.e("Config could not be refreshed from remote")
-                }
-                self.verifyContents(model: configModel, resultHandler: { (verified) in
-                    if verified {
-                        let dictionary = [
-                            "config": configModel.config,
-                            "keyId": configModel.keyId as Any,
-                            "signature": configModel.signature as Any
-                        ]
-                        self.write(dictionary)
-                    } else {
-                        Logger.e("Fetched dictionary contents failed verification")
+            DispatchQueue.global(qos: .utility).async {
+                self.fetcher.fetchConfig { (result) in
+                    guard let configModel = result else {
+                        return print("Config could not be refreshed from remote")
                     }
-                })
+                    self.verifyContents(model: configModel, resultHandler: { (verified) in
+                        if verified {
+                            let dictionary = [
+                                "config": configModel.config,
+                                "keyId": configModel.keyId as Any,
+                                "signature": configModel.signature as Any
+                            ]
+                            self.write(dictionary)
+                        } else {
+                            Logger.e("Fetched dictionary contents failed verification")
+                        }
+                    })
+                }
             }
         }
     }

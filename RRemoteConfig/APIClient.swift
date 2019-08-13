@@ -13,7 +13,7 @@ extension URLSession: SessionProtocol {
 internal class APIClient {
     let session: SessionProtocol
 
-    init(session: SessionProtocol = URLSession.shared) {
+    init(session: SessionProtocol = URLSession(configuration: URLSessionConfiguration.default)) {
         self.session = session
     }
 
