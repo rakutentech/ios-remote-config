@@ -23,7 +23,7 @@ internal class Fetcher {
                 config?.signature = response?.allHeaderFields["Signature"] as? String
                 completionHandler(config)
             case .failure(let error):
-                print("Config fetch \(String(describing: request.url)) result is error \(error.localizedDescription) and response \(String(describing: response))")
+                Logger.e("Config fetch url \(String(describing: request.url)) received error \(error.localizedDescription) for response \(String(describing: response))")
                 completionHandler(nil)
             }
         }
@@ -41,7 +41,7 @@ internal class Fetcher {
             case .success(let keyModel):
                 completionHandler(keyModel as? KeyModel)
             case .failure(let error):
-                print("Key fetch \(String(describing: request.url)) result is error \(error.localizedDescription) and response \(String(describing: response))")
+                Logger.e("Key fetch url \(String(describing: request.url)) received error \(error.localizedDescription) for response \(String(describing: response))")
                 completionHandler(nil)
             }
         }

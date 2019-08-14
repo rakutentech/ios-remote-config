@@ -11,14 +11,14 @@ internal class Environment {
     let bundle: EnvironmentSetupProtocol
     private var baseUrl: URL? {
         guard let endpointUrlString = bundle.value(for: "RRCConfigAPIEndpoint") else {
-            print("Ensure RRCConfigAPIEndpoint value in plist is valid")
+            Logger.e("Ensure RRCConfigAPIEndpoint value in plist is valid")
             return nil
         }
         return URL(string: "\(endpointUrlString)")
     }
     var configUrl: URL? {
         guard let appId = bundle.value(for: "RASApplicationIdentifier") else {
-            print("Ensure RASApplicationIdentifier value in plist is valid")
+            Logger.e("Ensure RASApplicationIdentifier value in plist is valid")
             return nil
         }
         return baseUrl?.appendingPathComponent("/app/\(appId)/config")
