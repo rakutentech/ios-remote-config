@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CONTRIBUTING  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a title="CONTRIBUTING  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html">RRemoteConfig Docs</a> (100% documented)</p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html">RRemoteConfig Reference</a>
+        <img id="carat" src="img/carat.png" />
+        CONTRIBUTING  Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="Guides.html">Guides</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="changelog.html">CHANGELOG</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="contributing.html">CONTRIBUTING</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="readme.html">README</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/RemoteConfig.html">RemoteConfig</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            
+            <h1 id='contributing' class='heading'>Contributing</h1>
+<h2 id='found-a-bug-got-a-suggestion' class='heading'>Found a Bug? Got a suggestion?</h2>
+
+<p>If you find a bug in the source code, or want to make a suggestion, you can help us by submitting an issue to our GitHub Repository. Even better, you could submit a Pull Request.</p>
+<h2 id='pull-requests' class='heading'>Pull Requests</h2>
+
+<ol>
+<li>Fork the project</li>
+<li>Implement feature/fix bug &amp; add test cases</li>
+<li>Ensure test cases &amp; static analysis run successfully</li>
+<li>Submit a pull request to <code>master</code> branch</li>
+</ol>
+
+<p>Please include unit tests where necessary to cover any functionality that is introduced.</p>
+<h2 id='coding-guidelines' class='heading'>Coding Guidelines</h2>
+
+<ul>
+<li>All features or bug fixes <strong>must be tested</strong> by one or more unit tests/specs</li>
+<li>All public API methods <strong>must be documented</strong> and potentially also described in the user guide.</li>
+<li>All code should follow the style of the existing code.</li>
+</ul>
+<h2 id='commit-messages' class='heading'>Commit messages</h2>
+
+<p>Each commit message consists of a header, a body and a footer. The header has a special format that includes a type, an optional scope and a subject:</p>
+<pre class="highlight plaintext"><code>&lt;type&gt;(&lt;scope&gt;): &lt;subject&gt;
+&lt;BLANK LINE&gt;
+&lt;body&gt;
+&lt;BLANK LINE&gt;
+&lt;footer&gt;
+</code></pre>
+
+<p>The <strong>header</strong> is mandatory and the <strong>scope</strong> part of the header is optional.</p>
+
+<p>Any line of the commit message cannot be longer than 100 characters! This allows the message to be easier
+to read on GitHub as well as in various git tools.</p>
+
+<p>Footer should contain a <a href="https://help.github.com/articles/closing-issues-via-commit-messages/">closing reference to an issue</a> if any.</p>
+<h3 id='revert' class='heading'>Revert</h3>
+
+<p>If the commit reverts a previous commit, it should begin with <code>revert:</code>, followed by the header of the reverted commit. In the body it should say: <code>This reverts commit &lt;hash&gt;.</code>, where the hash is the SHA of the commit being reverted.</p>
+<h3 id='type' class='heading'>Type</h3>
+
+<p>Must be one of the following:</p>
+
+<ul>
+<li><strong>build</strong>: Changes that affect the build system or external dependencies (example scopes: gradle, fastlane, npm)</li>
+<li><strong>ci</strong>: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)</li>
+<li><strong>docs</strong>: Documentation only changes</li>
+<li><strong>feat</strong>: A new feature</li>
+<li><strong>fix</strong>: A bug fix</li>
+<li><strong>perf</strong>: A code change that improves performance</li>
+<li><strong>refactor</strong>: A code change that neither fixes a bug nor adds a feature</li>
+<li><strong>style</strong>: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)</li>
+<li><strong>test</strong>: Adding missing tests or correcting existing tests</li>
+</ul>
+<h3 id='scope' class='heading'>Scope</h3>
+
+<p>The scope should be the name of the part of the module affected e.g. sender, manager etc.</p>
+<h3 id='subject' class='heading'>Subject</h3>
+
+<p>The subject contains a succinct description of the change:</p>
+
+<ul>
+<li>use the imperative, present tense: <q>change</q> not <q>changed</q> nor <q>changes</q></li>
+<li>don&rsquo;t capitalize first letter</li>
+<li>no dot (.) at the end</li>
+</ul>
+<h3 id='body' class='heading'>Body</h3>
+
+<p>Just as in the <strong>subject</strong>, use the imperative, present tense: <q>change</q> not <q>changed</q> nor <q>changes</q>.
+The body should include the motivation for the change and contrast this with previous behavior.</p>
+<h3 id='footer' class='heading'>Footer</h3>
+
+<p>The footer should contain any information about <strong>Breaking Changes</strong> and is also the place to
+reference GitHub issues that this commit <strong>Closes</strong>.</p>
+
+<p><strong>Breaking Changes</strong> should start with the word <code>BREAKING CHANGE:</code> with a space or two newlines. The rest of the commit message is then used for this.</p>
+
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2019 <a class="link" href="https://github.com/rakutentech/ios-remoteconfig" target="_blank" rel="external">Rakuten Ecosystem Mobile</a>. All rights reserved. (Last updated: 2019-08-15)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.10.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>
