@@ -9,3 +9,17 @@ before_install:
 - pod repo update
 
 script: fastlane ci
+
+after_success:
+  # generate docs
+- gem install jazzy
+- jazzy --xcodebuild-arguments -scheme,Tests --module RRemoteConfig --source-directory RRemoteConfig --podspec RRemoteConfig.podspec --exclude RRemoteConfig/Loader.swift --readme README.md
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep_history: true
+  local_dir: docs
+  on:
+    branch: master
