@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F1FF84343DDC8BEF2A5AD7A5"
-               BuildableName = "RemoteConfig Sample.app"
-               BlueprintName = "SampleApp"
+               BlueprintIdentifier = "6D1A1250231124EA004BBD77"
+               BuildableName = "TestHostRC.app"
+               BlueprintName = "TestHostRC"
                ReferencedContainer = "container:RRemoteConfig.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -26,26 +26,15 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      codeCoverageEnabled = "YES"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4E6F50CD47B83B8FD5482426"
-               BuildableName = "UnitTests.xctest"
-               BlueprintName = "UnitTests"
-               ReferencedContainer = "container:RRemoteConfig.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F1FF84343DDC8BEF2A5AD7A5"
-            BuildableName = "RemoteConfig Sample.app"
-            BlueprintName = "SampleApp"
+            BlueprintIdentifier = "6D1A1250231124EA004BBD77"
+            BuildableName = "TestHostRC.app"
+            BlueprintName = "TestHostRC"
             ReferencedContainer = "container:RRemoteConfig.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -66,9 +55,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F1FF84343DDC8BEF2A5AD7A5"
-            BuildableName = "RemoteConfig Sample.app"
-            BlueprintName = "SampleApp"
+            BlueprintIdentifier = "6D1A1250231124EA004BBD77"
+            BuildableName = "TestHostRC.app"
+            BlueprintName = "TestHostRC"
             ReferencedContainer = "container:RRemoteConfig.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -76,20 +65,21 @@
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F1FF84343DDC8BEF2A5AD7A5"
-            BuildableName = "RemoteConfig Sample.app"
-            BlueprintName = "SampleApp"
+            BlueprintIdentifier = "6D1A1250231124EA004BBD77"
+            BuildableName = "TestHostRC.app"
+            BlueprintName = "TestHostRC"
             ReferencedContainer = "container:RRemoteConfig.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

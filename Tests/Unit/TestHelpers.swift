@@ -63,8 +63,8 @@ class CacheMock: ConfigCache {
 class FetcherMock: Fetcher {
     var fetchConfigCalledNumTimes = 0
     var fetchKeyCalledNumTimes = 0
-    var fetchedConfig = ConfigModel(config: ["": ""])
-    var fetchedKey = KeyModel(id: "", key: "", createdAt: "")
+    var fetchedConfig = ConfigModel(data: (try? JSONSerialization.data(withJSONObject: ["": ""], options: []))!)
+    var fetchedKey = KeyModel(data: (try? JSONSerialization.data(withJSONObject: ["id": "", "key": "", "createdAt": ""], options: []))!)
 
     override func fetchConfig(completionHandler: @escaping (ConfigModel?) -> Void) {
         fetchConfigCalledNumTimes += 1
@@ -80,7 +80,7 @@ class FetcherMock: Fetcher {
 class VerifierMock: Verifier {
     var verifyOK = true
 
-    override func verify(signatureBase64: String, dictionary: [String: Any], keyBase64: String) -> Bool {
+    override func verify(signatureBase64: String, objectData: Data, keyBase64: String) -> Bool {
         return verifyOK
     }
 }
@@ -102,21 +102,25 @@ class KeyStoreMock: KeyStore {
 }
 
 class APIClientMock: APIClient {
-    var dictionary: [String: String]?
+    var dictionary: [String: Any]?
     var headers: [String: String]?
     var error: Error?
     var request: URLRequest?
-    override func send<T>(request: URLRequest, decodeAs: T.Type, completionHandler: @escaping (Result<Any, Error>, HTTPURLResponse?) -> Void) where T: Decodable {
+
+    override func send<T>(request: URLRequest, parser: T.Type, completionHandler: @escaping (Result<Response, Error>) -> Void) where T: Parsable {
         self.request = request
 
         guard let dictionary = dictionary else {
-            return completionHandler(.failure(error ?? NSError(domain: "Test", code: 0, userInfo: nil)), nil)
+            return completionHandler(.failure(error ?? NSError(domain: "Test", code: 0, userInfo: nil)))
         }
-        let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: "1.1", headerFields: headers)
-        return completionHandler(.success(ConfigModel(config: dictionary)), response)
+        if let httpResponse = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: "1.1", headerFields: headers),
+            let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+            let config = ConfigModel(data: jsonData) {
+            return completionHandler(.success(Response(config, jsonData, httpResponse)))
+        }
     }
 }
 
-func createCacheMock(initialContents: [String: String] = ["": ""]) -> CacheMock {
+func createCacheMock(initialContents: [String: Any] = ["body": ["": ""]]) -> CacheMock {
     return CacheMock(fetcher: Fetcher(client: APIClient(), environment: Environment()), poller: Poller(), initialCacheContents: initialContents)
 }

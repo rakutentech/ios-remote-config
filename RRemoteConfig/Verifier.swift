@@ -1,17 +1,10 @@
 internal class Verifier {
     func verify(signatureBase64: String,
-                dictionary: [String: Any],
+                objectData: Data,
                 keyBase64: String) -> Bool {
         guard let secKey = createSecKey(for: keyBase64),
             let signatureData = Data(base64Encoded: signatureBase64) else {
                 return false
-        }
-
-        var objectData: Data = Data()
-        do {
-            objectData = try JSONSerialization.data(withJSONObject: dictionary, options: [])
-        } catch {
-            return false
         }
 
         var error: Unmanaged<CFError>?
