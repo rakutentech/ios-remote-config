@@ -20,8 +20,8 @@ internal class Verifier {
                                              objectData as CFData,
                                              signatureData as CFData,
                                              &error)
-        if error != nil {
-            print(error as Any)
+        if let err = error as? Error {
+            Logger.e(err.localizedDescription)
         }
         return verified
     }
@@ -38,13 +38,15 @@ internal class Verifier {
 
         var error: Unmanaged<CFError>?
         guard let secKey = SecKeyCreateWithData(secKeyData as CFData, attributes as CFDictionary, &error) else {
-            print(error as Any)
+            if let err = error as? Error {
+                Logger.e(err.localizedDescription)
+            }
             return nil
         }
-        print(secKey as Any)
+        Logger.d("Key created: \(String(describing: secKey))")
 
         if !SecKeyIsAlgorithmSupported(secKey, .verify, .ecdsaSignatureMessageX962SHA256) {
-            print("Key doesn't support algorithm ecdsaSignatureMessageX962SHA256")
+            Logger.e("Key doesn't support algorithm ecdsaSignatureMessageX962SHA256")
             return nil
         }
         return secKey

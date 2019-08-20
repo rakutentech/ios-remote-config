@@ -25,9 +25,7 @@ internal class ConfigCache {
         }
         DispatchQueue.global(qos: .utility).async {
             if let dictionary = NSDictionary.init(contentsOf: self.cacheUrl) as? [String: Any] {
-                #if DEBUG
-                print("Config read from cache plist \(cacheUrl): \(dictionary)")
-                #endif
+                Logger.d("Config read from cache plist \(cacheUrl): \(dictionary)")
 
                 guard let configDic = dictionary["config"] as? [String: String] else {
                     return
@@ -36,10 +34,10 @@ internal class ConfigCache {
                 configModel.signature = dictionary["signature"] as? String
 
                 if self.verifyContents(model: configModel) {
-                    print("Set active config to cached contents")
+                    Logger.d("Set active config to cached contents")
                     self.activeConfig = configModel
                 } else {
-                    print("Cached dictionary contents failed verification")
+                    Logger.e("Cached dictionary contents failed verification")
                 }
             }
         }
@@ -49,7 +47,7 @@ internal class ConfigCache {
         self.poller.start {
             self.fetcher.fetchConfig { (result) in
                 guard let configModel = result else {
-                    return print("Config could not be refreshed from remote")
+                    return Logger.e("Config could not be refreshed from remote")
                 }
                 self.verifyContents(model: configModel, resultHandler: { (verified) in
                     if verified {
@@ -60,7 +58,7 @@ internal class ConfigCache {
                         ]
                         self.write(dictionary)
                     } else {
-                        print("Fetched dictionary contents failed verification")
+                        Logger.e("Fetched dictionary contents failed verification")
                     }
                 })
             }
@@ -70,10 +68,8 @@ internal class ConfigCache {
     fileprivate func write(_ config: [String: Any]) {
         DispatchQueue.global(qos: .utility).async {
             NSDictionary(dictionary: config).write(to: self.cacheUrl, atomically: true)
-            #if DEBUG
             let readFromPlist = NSDictionary(contentsOf: self.cacheUrl)
-            print("Config written to url \(self.cacheUrl):\n\n \(String(describing: readFromPlist))")
-            #endif
+            Logger.d("Config written to url \(self.cacheUrl):\n\n \(String(describing: readFromPlist))")
         }
     }
 }

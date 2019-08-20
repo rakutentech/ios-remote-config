@@ -55,7 +55,7 @@ internal class KeyStore {
         if status != errSecSuccess {
             if #available(iOS 11.3, *) {
                 let error = SecCopyErrorMessageString(status, nil)
-                print("addKey error \(String(describing: error))")
+                Logger.e("addKey error \(String(describing: error))")
             }
         }
     }
