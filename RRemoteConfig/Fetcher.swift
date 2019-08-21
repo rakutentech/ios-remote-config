@@ -13,14 +13,14 @@ internal class Fetcher {
             return completionHandler(nil)
         }
         var request = URLRequest(url: url)
-        request.addHeader("apiKey", "ras-\(environment.subscriptionKey)")
-        request.setExtraHeaders(from: environment)
+        request.setConfigHeaders(from: environment)
 
         apiClient.send(request: request, decodeAs: ConfigModel.self) { (result, response) in
             switch result {
             case .success(let resultConfig):
                 var config = resultConfig as? ConfigModel
                 config?.signature = response?.allHeaderFields["Signature"] as? String
+                self.environment.etag = response?.allHeaderFields["Etag"] as? String
                 completionHandler(config)
             case .failure(let error):
                 Logger.e("Config fetch url \(String(describing: request.url)) received error \(error.localizedDescription) for response \(String(describing: response))")

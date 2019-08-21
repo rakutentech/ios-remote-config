@@ -101,6 +101,22 @@ class KeyStoreMock: KeyStore {
     }
 }
 
+class APIClientMock: APIClient {
+    var dictionary: [String: String]?
+    var headers: [String: String]?
+    var error: Error?
+    var request: URLRequest?
+    override func send<T>(request: URLRequest, decodeAs: T.Type, completionHandler: @escaping (Result<Any, Error>, HTTPURLResponse?) -> Void) where T: Decodable {
+        self.request = request
+
+        guard let dictionary = dictionary else {
+            return completionHandler(.failure(error ?? NSError(domain: "Test", code: 0, userInfo: nil)), nil)
+        }
+        let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: "1.1", headerFields: headers)
+        return completionHandler(.success(ConfigModel(config: dictionary)), response)
+    }
+}
+
 func createCacheMock(initialContents: [String: String] = ["": ""]) -> CacheMock {
     return CacheMock(fetcher: Fetcher(client: APIClient(), environment: Environment()), poller: Poller(), initialCacheContents: initialContents)
 }

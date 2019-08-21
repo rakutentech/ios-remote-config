@@ -244,7 +244,7 @@ class ConfigCacheSpec: QuickSpec {
                 fetcher.fetchConfigCalledNumTimes = 0
                 configCache.refreshFromRemote()
 
-                expect(fetcher.fetchConfigCalledNumTimes).to(equal(1))
+                expect(fetcher.fetchConfigCalledNumTimes).toEventually(equal(1))
             }
 
             describe("when the verification key is found locally") {
@@ -301,7 +301,7 @@ class ConfigCacheSpec: QuickSpec {
                 it("calls the fetch key function") {
                     configCache.refreshFromRemote()
 
-                    expect(fetcher.fetchKeyCalledNumTimes).to(equal(1))
+                    expect(fetcher.fetchKeyCalledNumTimes).toEventually(equal(1))
                 }
 
                 it("adds the key after fetching it") {
