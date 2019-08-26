@@ -10,7 +10,7 @@ internal struct ConfigModel: Parsable {
 
     init?(data: Data) {
         var dictionary: [String: Any]?
-        print("payload data as string: \(String(data: data, encoding: .utf8) ?? "data cannot be encoded to utf8 string")")
+        Logger.d("Payload data as string: \(String(data: data, encoding: .utf8) ?? "data cannot be encoded to utf8 string")")
         do {
             dictionary = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
         } catch let error {

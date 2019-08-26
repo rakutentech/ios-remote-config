@@ -42,7 +42,6 @@ class ConfigCacheSpec: QuickSpec {
                 beforeEach {
                     let written = NSDictionary(dictionary:
                         ["config": jsonData,
-                         "keyId": "1234",
                          "signature": "sigfoo"
                         ]).write(to: url, atomically: true)
                     print("test data written to cache url \(url): \(String(describing: written))")
