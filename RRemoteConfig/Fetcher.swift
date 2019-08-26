@@ -8,6 +8,7 @@ internal class Fetcher {
         self.environment = environment
     }
 
+    // MARK: Fetch Config
     func fetchConfig(completionHandler: @escaping (ConfigModel?) -> Void) {
         guard let url = environment.configUrl else {
             return completionHandler(nil)
@@ -15,20 +16,22 @@ internal class Fetcher {
         var request = URLRequest(url: url)
         request.setConfigHeaders(from: environment)
 
-        apiClient.send(request: request, decodeAs: ConfigModel.self) { (result, response) in
+        apiClient.send(request: request, parser: ConfigModel.self) { (result) in
             switch result {
-            case .success(let resultConfig):
-                var config = resultConfig as? ConfigModel
-                config?.signature = response?.allHeaderFields["Signature"] as? String
-                self.environment.etag = response?.allHeaderFields["Etag"] as? String
+            case .success(let response):
+                var config = response.object as? ConfigModel
+                let headers = response.httpResponse.allHeaderFields as? [String: String]
+                config?.signature = headers?["Signature"]
+                self.environment.etag = headers?["Etag"]
                 completionHandler(config)
             case .failure(let error):
-                Logger.e("Config fetch url \(String(describing: request.url)) received error \(error.localizedDescription) for response \(String(describing: response))")
+                Logger.e("Config fetch \(String(describing: request.url)) error occurred: \(error.localizedDescription)")
                 completionHandler(nil)
             }
         }
     }
 
+    // MARK: Fetch Key
     func fetchKey(with keyId: String, completionHandler: @escaping (KeyModel?) -> Void) {
         guard let url = environment.keyUrl(with: keyId) else {
             return completionHandler(nil)
@@ -36,20 +39,14 @@ internal class Fetcher {
         var request = URLRequest(url: url)
         request.addHeader("apiKey", "ras-\(environment.subscriptionKey)")
 
-        apiClient.send(request: request, decodeAs: KeyModel.self) { (result, response) in
+        apiClient.send(request: request, parser: KeyModel.self) { (result) in
             switch result {
-            case .success(let keyModel):
-                completionHandler(keyModel as? KeyModel)
+            case .success(let response):
+                completionHandler(response.object as? KeyModel)
             case .failure(let error):
-                Logger.e("Key fetch url \(String(describing: request.url)) received error \(error.localizedDescription) for response \(String(describing: response))")
+                Logger.e("Key fetch \(String(describing: request.url)) error occurred: \(error.localizedDescription)")
                 completionHandler(nil)
             }
         }
     }
-}
-
-internal struct KeyModel: Decodable {
-    let id: String
-    let key: String
-    let createdAt: String
 }

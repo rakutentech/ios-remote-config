@@ -148,7 +148,7 @@ class ConfigFetcherSpec: QuickSpec {
                 it("will set the config dictionary in the result passed to the completion handler") {
                     var testResult: Any?
                     let apiClientMock = APIClientMock()
-                    apiClientMock.dictionary = ["foo": "bar"]
+                    apiClientMock.dictionary = ["body": ["foo": "bar"]]
                     let fetcher = Fetcher(client: apiClientMock, environment: Environment())
 
                     fetcher.fetchConfig(completionHandler: { (result) in
@@ -173,15 +173,17 @@ class ConfigFetcherSpec: QuickSpec {
                 }
 
                 it("will save the etag to user defaults") {
+                    UserDefaults.standard.removeObject(forKey: Environment.etagKey)
                     let apiClientMock = APIClientMock()
-                    apiClientMock.dictionary = ["foo": "bar"]
+                    let env = Environment()
+                    apiClientMock.dictionary = ["body": ["foo": "bar"]]
                     apiClientMock.headers = ["Etag": "an-etag"]
-                    let fetcher = Fetcher(client: apiClientMock, environment: Environment())
+                    let fetcher = Fetcher(client: apiClientMock, environment: env)
 
                     fetcher.fetchConfig(completionHandler: { (_) in
                     })
 
-                    expect(UserDefaults.standard.string(forKey: Environment.etagKey)).toEventually(equal("an-etag"))
+                    expect(env.etag).toEventually(equal("an-etag"), timeout: 2)
                 }
             }
 
