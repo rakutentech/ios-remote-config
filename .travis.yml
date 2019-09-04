@@ -4,15 +4,16 @@ xcode_scheme: Tests
 osx_image: xcode10.2
 
 before_install:
-- gem install xcov
-- gem update fastlane cocoapods xcov --no-document
+- bundle install
+- gem update fastlane cocoapods --no-document
 - pod repo update
 
-script: fastlane ci
+script:
+- fastlane ci
+- bundle exec danger
 
 after_success:
   # generate docs
-- gem install jazzy
 - jazzy --xcodebuild-arguments -scheme,Tests --module RRemoteConfig --source-directory RRemoteConfig --podspec RRemoteConfig.podspec --exclude RRemoteConfig/Loader.swift --readme README.md
 
 deploy:
