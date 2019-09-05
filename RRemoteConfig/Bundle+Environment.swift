@@ -3,7 +3,7 @@ extension Bundle: EnvironmentSetupProtocol {
         return "NONE"
     }
 
-    func deviceOsVersion() -> String {
+    func osVersion() -> String {
         return UIDevice.current.systemVersion
     }
 
