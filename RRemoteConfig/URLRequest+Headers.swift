@@ -1,8 +1,8 @@
 extension URLRequest {
-    mutating func setConfigHeaders(from environment: Environment) {
+    mutating func setHeaders(from environment: Environment) {
         addHeader("ras-app-id", environment.appId)
         addHeader("ras-device-model", environment.deviceModel)
-        addHeader("ras-device-version", environment.deviceOsVersion)
+        addHeader("ras-os-version", environment.osVersion)
         addHeader("ras-sdk-name", environment.sdkName)
         addHeader("ras-sdk-version", environment.sdkVersion)
         addHeader("ras-app-name", environment.appName)

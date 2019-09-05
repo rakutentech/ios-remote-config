@@ -13,10 +13,9 @@ internal class Fetcher {
         guard let url = environment.configUrl else {
             return completionHandler(nil)
         }
-        var request = URLRequest(url: url)
-        request.setConfigHeaders(from: environment)
+        var configRequest = request(for: url)
 
-        apiClient.send(request: request, parser: ConfigModel.self) { (result) in
+        apiClient.send(request: configRequest, parser: ConfigModel.self) { (result) in
             switch result {
             case .success(let response):
                 var config = response.object as? ConfigModel
@@ -25,7 +24,7 @@ internal class Fetcher {
                 self.environment.etag = headers?["Etag"]
                 completionHandler(config)
             case .failure(let error):
-                Logger.e("Config fetch \(String(describing: request.url)) error occurred: \(error.localizedDescription)")
+                Logger.e("Config fetch \(String(describing: configRequest.url)) error occurred: \(error.localizedDescription)")
                 completionHandler(nil)
             }
         }
@@ -36,17 +35,22 @@ internal class Fetcher {
         guard let url = environment.keyUrl(with: keyId) else {
             return completionHandler(nil)
         }
-        var request = URLRequest(url: url)
-        request.addHeader("apiKey", "ras-\(environment.subscriptionKey)")
+        var keyRequest = request(for: url)
 
-        apiClient.send(request: request, parser: KeyModel.self) { (result) in
+        apiClient.send(request: keyRequest, parser: KeyModel.self) { (result) in
             switch result {
             case .success(let response):
                 completionHandler(response.object as? KeyModel)
             case .failure(let error):
-                Logger.e("Key fetch \(String(describing: request.url)) error occurred: \(error.localizedDescription)")
+                Logger.e("Key fetch \(String(describing: keyRequest.url)) error occurred: \(error.localizedDescription)")
                 completionHandler(nil)
             }
         }
+    }
+
+    fileprivate func request(for url: URL) -> URLRequest {
+        var request = URLRequest(url: url)
+        request.setHeaders(from: environment)
+        return request
     }
 }

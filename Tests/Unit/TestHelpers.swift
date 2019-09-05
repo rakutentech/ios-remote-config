@@ -21,7 +21,7 @@ class BundleMock: EnvironmentSetupProtocol {
         case "RASProjectSubscriptionKey":
             return mockSubKey
         case "CFBundleIdentifier":
-            return mockAppId
+            return mockAppName
         case "CFBundleDisplayName":
             return mockAppName
         case "CFBundleShortVersionString":
@@ -39,7 +39,7 @@ class BundleMock: EnvironmentSetupProtocol {
         return mockDeviceModel ?? valueNotFound
     }
 
-    func deviceOsVersion() -> String {
+    func osVersion() -> String {
         return mockOsVersion ?? valueNotFound
     }
 
@@ -115,8 +115,8 @@ class APIClientMock: APIClient {
         }
         if let httpResponse = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: "1.1", headerFields: headers),
             let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-            let config = ConfigModel(data: jsonData) {
-            return completionHandler(.success(Response(config, jsonData, httpResponse)))
+            let object = parser.init(data: jsonData) {
+            return completionHandler(.success(Response(object, jsonData, httpResponse)))
         }
     }
 }

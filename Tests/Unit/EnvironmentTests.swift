@@ -82,7 +82,7 @@ class EnvironmentSpec: QuickSpec {
 
                 let environment = Environment(bundle: mockBundle)
 
-                expect(environment.deviceOsVersion).to(equal("foo"))
+                expect(environment.osVersion).to(equal("foo"))
             }
 
             it("has the expected device model") {
@@ -147,7 +147,7 @@ class EnvironmentSpec: QuickSpec {
             }
 
             it("will return the 'not found' value when device os version can't be read") {
-                expect(environment.deviceOsVersion).to(equal(mockBundleInvalid.valueNotFound))
+                expect(environment.osVersion).to(equal(mockBundleInvalid.valueNotFound))
             }
 
             it("will return the 'not found' value when sdk name can't be read") {

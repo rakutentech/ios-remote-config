@@ -4,8 +4,11 @@ line_length:
   - 200 # warning
   - 300 # error
 function_body_length:
-  - 200
-  - 200
+  - 300
+  - 500
+type_body_length:
+  - 300
+  - 400
 cyclomatic_complexity:
   - 20
   - 20

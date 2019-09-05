@@ -2,7 +2,7 @@ internal protocol EnvironmentSetupProtocol {
     var valueNotFound: String { get }
     func value(for key: String) -> String?
     func deviceModel() -> String
-    func deviceOsVersion() -> String
+    func osVersion() -> String
     func sdkName() -> String
     func sdkVersion() -> String
 }
@@ -28,10 +28,10 @@ internal class Environment {
         return bundle.value(for: "RASProjectSubscriptionKey") ?? bundle.valueNotFound
     }
     var appId: String {
-        return bundle.value(for: "CFBundleIdentifier" as String) ?? bundle.valueNotFound
+        return bundle.value(for: "RASApplicationIdentifier" as String) ?? bundle.valueNotFound
     }
     var appName: String {
-        return bundle.value(for: "CFBundleDisplayName" as String) ?? bundle.valueNotFound
+        return bundle.value(for: "CFBundleIdentifier" as String) ?? bundle.valueNotFound
     }
     var appVersion: String {
         return bundle.value(for: "CFBundleShortVersionString" as String) ?? bundle.valueNotFound
@@ -39,8 +39,8 @@ internal class Environment {
     var deviceModel: String {
         return bundle.deviceModel()
     }
-    var deviceOsVersion: String {
-        return bundle.deviceOsVersion()
+    var osVersion: String {
+        return bundle.osVersion()
     }
     var sdkName: String {
         return bundle.sdkName()
