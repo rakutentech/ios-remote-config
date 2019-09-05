@@ -8,7 +8,7 @@ internal class RealRemoteConfig {
 
     init() {
         self.environment = Environment()
-        self.poller = Poller()
+        self.poller = Poller(delay: 60.0 * 5)
         self.apiClient = APIClient()
         self.fetcher = Fetcher(client: apiClient, environment: environment)
         self.cache = ConfigCache(fetcher: fetcher, poller: poller)
