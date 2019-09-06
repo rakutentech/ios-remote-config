@@ -2,18 +2,6 @@ import Quick
 import Nimble
 @testable import RRemoteConfig
 
-extension KeyStore {
-    func delete(keyId: String) {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "unit-tests",
-            kSecAttrAccount as String: keyId,
-            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        ]
-        SecItemDelete(query as CFDictionary)
-    }
-}
-
 class KeyStoreSpec: QuickSpec {
     override func spec() {
         // Keychain can't be mocked so the best we can do
@@ -22,20 +10,44 @@ class KeyStoreSpec: QuickSpec {
         let keyStore = KeyStore(service: "unit-tests")
 
         beforeEach {
-            keyStore.delete(keyId: "key-id")
-            keyStore.delete(keyId: "key-id-2")
+            keyStore.empty()
         }
 
-        it("can retrieve an added key") {
-            keyStore.addKey(key: "a-key", for: "key-id")
+        context("keystore initially empty") {
+            it("can retrieve an added key") {
+                keyStore.addKey(key: "a-key", for: "key-id")
 
-            expect(keyStore.key(for: "key-id")).to(equal("a-key"))
+                expect(keyStore.key(for: "key-id")).to(equal("a-key"))
+            }
+
+            it("returns nil when attempt to retrieve a key not in keystore") {
+                keyStore.addKey(key: "a-key", for: "key-id")
+
+                expect(keyStore.key(for: "key-id-2")).to(beNil())
+            }
+
+            it("can retrieve a key that has been added twice") {
+                keyStore.addKey(key: "a-key", for: "key-id")
+                keyStore.addKey(key: "a-key", for: "key-id")
+
+                expect(keyStore.key(for: "key-id")).to(equal("a-key"))
+            }
         }
 
-        it("returns nil when key not found") {
-            keyStore.addKey(key: "a-key", for: "key-id-2")
+        context("keystore has multiple keys") {
+            beforeEach {
+                keyStore.addKey(key: "a-key-1", for: "key-id-1")
+                keyStore.addKey(key: "a-key-2", for: "key-id-2")
+                keyStore.addKey(key: "a-key-3", for: "key-id-3")
+            }
 
-            expect(keyStore.key(for: "key-id")).to(beNil())
+            it("can retrieve a key") {
+                expect(keyStore.key(for: "key-id-1")).to(equal("a-key-1"))
+            }
+
+            it("returns nil when attempt to retrieve a key not in keystore") {
+                expect(keyStore.key(for: "key-id-4")).to(beNil())
+            }
         }
     }
 }

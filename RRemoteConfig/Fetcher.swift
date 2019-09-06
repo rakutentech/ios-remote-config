@@ -13,7 +13,7 @@ internal class Fetcher {
         guard let url = environment.configUrl else {
             return completionHandler(nil)
         }
-        var configRequest = request(for: url)
+        let configRequest = request(for: url)
 
         apiClient.send(request: configRequest, parser: ConfigModel.self) { (result) in
             switch result {
@@ -35,7 +35,7 @@ internal class Fetcher {
         guard let url = environment.keyUrl(with: keyId) else {
             return completionHandler(nil)
         }
-        var keyRequest = request(for: url)
+        let keyRequest = request(for: url)
 
         apiClient.send(request: keyRequest, parser: KeyModel.self) { (result) in
             switch result {
