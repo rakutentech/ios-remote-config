@@ -17,10 +17,17 @@ internal class Logger {
         #endif
     }
 
+    /// Verbose
+    class func v(_ message: String) {
+        #if DEBUG
+        //print("🔍 \(message)")
+        #endif
+    }
+
     /// Error
     class func e(_ message: String) {
         #if DEBUG
-        print("💣 \(message)")
+        print("❌ \(message)")
         #else
         os_log("%@", log: OSLog.sdk, type: .error, message)
         #endif

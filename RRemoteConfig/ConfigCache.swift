@@ -26,7 +26,7 @@ internal class ConfigCache {
         }
         DispatchQueue.global(qos: .utility).async {
             if let dictionary = NSDictionary.init(contentsOf: self.cacheUrl) as? [String: Any] {
-                Logger.d("Config read from cache plist \(cacheUrl): \(dictionary)")
+                Logger.v("Config read from cache plist \(cacheUrl): \(dictionary)")
 
                 guard
                     let configData = dictionary["config"] as? Data,
@@ -36,7 +36,7 @@ internal class ConfigCache {
                 configModel.signature = dictionary["signature"] as? String
 
                 if self.verifyContents(model: configModel) {
-                    Logger.d("Set active config to cached contents")
+                    Logger.d("Cached contents verified -> set as active config")
                     self.activeConfig = configModel
                 } else {
                     Logger.e("Cached dictionary contents failed verification")
@@ -105,7 +105,8 @@ internal class ConfigCache {
         DispatchQueue.global(qos: .utility).async {
             NSDictionary(dictionary: config).write(to: self.cacheUrl, atomically: true)
             let readFromPlist = NSDictionary(contentsOf: self.cacheUrl)
-            Logger.d("Config written to url \(self.cacheUrl):\n\n \(String(describing: readFromPlist))")
+            Logger.d("Fetched config verified and cached")
+            Logger.v("Contents written to url \(self.cacheUrl):\n\(String(describing: readFromPlist))")
         }
     }
 }

@@ -12,12 +12,10 @@ extension URLSession: SessionProtocol {
 
 internal struct Response {
     let object: Parsable
-    let data: Data
     let httpResponse: HTTPURLResponse
 
-    init(_ object: Parsable, _ data: Data, _ response: HTTPURLResponse) {
+    init(_ object: Parsable, _ response: HTTPURLResponse) {
         self.object = object
-        self.data = data
         self.httpResponse = response
     }
 }
@@ -36,7 +34,7 @@ internal class APIClient {
             if let httpResponse = response as? HTTPURLResponse,
                 let payloadData = data,
                 let object = parser.init(data: payloadData) {
-                return completionHandler(.success(Response(object, payloadData, httpResponse)))
+                return completionHandler(.success(Response(object, httpResponse)))
             }
 
             // Error handling:
@@ -52,6 +50,7 @@ internal class APIClient {
                 return completionHandler(.failure(NSError.serverError(code: errorModel.code, message: errorModel.message)))
             } catch {
                 let serverError = NSError.serverError(code: (response as? HTTPURLResponse)?.statusCode ?? 0, message: "Unspecified server error occurred")
+                Logger.e("Error: \(String(describing: serverError))")
                 return completionHandler(.failure(serverError))
             }
         }

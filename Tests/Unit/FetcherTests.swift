@@ -148,7 +148,10 @@ class FetcherSpec: QuickSpec {
                 it("will set the config dictionary in the result passed to the completion handler") {
                     var testResult: Any?
                     let apiClientMock = APIClientMock()
-                    apiClientMock.dictionary = ["body": ["foo": "bar"]]
+                    let dataString = """
+                        {"body":{"foo":"bar"}}
+                        """
+                    apiClientMock.data = dataString.data(using: .utf8)
                     let fetcher = Fetcher(client: apiClientMock, environment: Environment())
 
                     fetcher.fetchConfig(completionHandler: { (result) in
@@ -161,7 +164,10 @@ class FetcherSpec: QuickSpec {
                 it("will set the signature in the result passed to the completion handler") {
                     var testResult: Any?
                     let apiClientMock = APIClientMock()
-                    apiClientMock.dictionary = ["foo": "bar"]
+                    let dataString = """
+                        {"body":{"foo":"bar"}}
+                        """
+                    apiClientMock.data = dataString.data(using: .utf8)
                     apiClientMock.headers = ["Signature": "a-sig"]
                     let fetcher = Fetcher(client: apiClientMock, environment: Environment())
 
@@ -176,7 +182,10 @@ class FetcherSpec: QuickSpec {
                     UserDefaults.standard.removeObject(forKey: Environment.etagKey)
                     let apiClientMock = APIClientMock()
                     let env = Environment()
-                    apiClientMock.dictionary = ["body": ["foo": "bar"]]
+                    let dataString = """
+                        {"body":{"foo":"bar"}}
+                        """
+                    apiClientMock.data = dataString.data(using: .utf8)
                     apiClientMock.headers = ["Etag": "an-etag"]
                     let fetcher = Fetcher(client: apiClientMock, environment: env)
 
@@ -345,7 +354,10 @@ class FetcherSpec: QuickSpec {
                 it("will set the config dictionary in the result passed to the completion handler") {
                     var testResult: Any?
                     let apiClientMock = APIClientMock()
-                    apiClientMock.dictionary = ["id": "foo", "key": "myKeyId", "createdAt": "boo" ]
+                    let dataString = """
+                        {"id":"foo","key":"myKeyId","createdAt":"boo"}
+                        """
+                    apiClientMock.data = dataString.data(using: .utf8)
                     let fetcher = Fetcher(client: apiClientMock, environment: Environment())
 
                     fetcher.fetchKey(with: "key", completionHandler: { (result) in
