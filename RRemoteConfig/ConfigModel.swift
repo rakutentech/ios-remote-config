@@ -2,24 +2,29 @@ protocol Parsable {
     init?(data: Data)
 }
 
+typealias ConfigDictionary = [String: String]
+
 internal struct ConfigModel: Parsable {
     let jsonData: Data
-    let config: [String: String]
+    let config: ConfigDictionary
     var keyId: String?
     var signature: String?
 
     init?(data: Data) {
         var dictionary: [String: Any]?
-        Logger.d("Payload data as string: \(String(data: data, encoding: .utf8) ?? "data cannot be encoded to utf8 string")")
+        var jsonData = data
+        Logger.v("Raw payload data as string: \(String(describing: String(data: jsonData, encoding: .utf8)))")
+
         do {
-            dictionary = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+            dictionary = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any]
         } catch let error {
             Logger.e(error.localizedDescription)
             return nil
         }
-        self.jsonData = data
-        self.config = dictionary?["body"] as? [String: String] ?? [:]
-        self.keyId = dictionary?["keyId"] as? String
+
+        self.jsonData = jsonData.trailingNewlineTrimmed()
+        self.config = dictionary?["body"] as? ConfigDictionary ?? [:]
+        self.keyId = dictionary?["keyId"] as? String ?? ""
     }
 }
 
@@ -29,11 +34,30 @@ internal struct KeyModel: Decodable, Parsable {
     let createdAt: String
 
     init?(data: Data) {
-        guard let dictionary = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: String] else {
+        guard let dictionary = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: String],
+            let id = dictionary["id"],
+            let key = dictionary["key"],
+            let createdAt = dictionary["createdAt"] else {
             return nil
         }
-        self.id = dictionary["id"] ?? ""
-        self.key = dictionary["key"] ?? ""
-        self.createdAt = dictionary["createdAt"] ?? ""
+        self.id = id
+        self.key = key
+        self.createdAt = createdAt
+    }
+}
+
+extension Data {
+    mutating func trailingNewlineTrimmed() -> Data {
+        let data = self
+        guard let dataString = String(data: data, encoding: .utf8) else {
+            return self
+        }
+
+        if dataString.hasSuffix("\n") {
+            Logger.v("Trimming newline from data")
+            let trimmedDataString = String(dataString.dropLast())
+            self = trimmedDataString.data(using: .utf8) ?? data
+        }
+        return self
     }
 }

@@ -2,6 +2,7 @@ internal class Verifier {
     func verify(signatureBase64: String,
                 objectData: Data,
                 keyBase64: String) -> Bool {
+        Logger.v("Verify data for \(String(describing: String(data: objectData, encoding: .utf8))) with signature \(signatureBase64) and key \(keyBase64)")
         guard let secKey = createSecKey(for: keyBase64),
             let signatureData = Data(base64Encoded: signatureBase64) else {
                 return false
@@ -13,6 +14,7 @@ internal class Verifier {
                                              objectData as CFData,
                                              signatureData as CFData,
                                              &error)
+        Logger.v("Verified: \(String(describing: verified))")
         if let err = error as? Error {
             Logger.e(err.localizedDescription)
         }
@@ -36,7 +38,7 @@ internal class Verifier {
             }
             return nil
         }
-        Logger.d("Key created: \(String(describing: secKey))")
+        Logger.v("Key created: \(String(describing: secKey))")
 
         if !SecKeyIsAlgorithmSupported(secKey, .verify, .ecdsaSignatureMessageX962SHA256) {
             Logger.e("Key doesn't support algorithm ecdsaSignatureMessageX962SHA256")

@@ -21,7 +21,9 @@ internal class KeyStore {
             return nil
         }
 
-        return String(data: objectData, encoding: .utf8)
+        let key = String(data: objectData, encoding: .utf8)
+        Logger.v("Key id \(keyId) matched to key \(String(describing: key))")
+        return key
     }
 
     func addKey(key: String, for keyId: String) {
@@ -53,10 +55,13 @@ internal class KeyStore {
         }
 
         if status != errSecSuccess {
+            var error: String?
             if #available(iOS 11.3, *) {
-                let error = SecCopyErrorMessageString(status, nil)
-                Logger.e("addKey error \(String(describing: error))")
+                error = SecCopyErrorMessageString(status, nil) as String?
+            } else {
+                error = "OSStatus \(status)"
             }
+            Logger.e("addKey error \(String(describing: error))")
         }
     }
 }

@@ -102,7 +102,7 @@ class KeyStoreMock: KeyStore {
 }
 
 class APIClientMock: APIClient {
-    var dictionary: [String: Any]?
+    var data: Data?
     var headers: [String: String]?
     var error: Error?
     var request: URLRequest?
@@ -110,13 +110,12 @@ class APIClientMock: APIClient {
     override func send<T>(request: URLRequest, parser: T.Type, completionHandler: @escaping (Result<Response, Error>) -> Void) where T: Parsable {
         self.request = request
 
-        guard let dictionary = dictionary else {
+        guard let data = data else {
             return completionHandler(.failure(error ?? NSError(domain: "Test", code: 0, userInfo: nil)))
         }
         if let httpResponse = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: "1.1", headerFields: headers),
-            let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
-            let object = parser.init(data: jsonData) {
-            return completionHandler(.success(Response(object, jsonData, httpResponse)))
+            let object = parser.init(data: data) {
+            return completionHandler(.success(Response(object, httpResponse)))
         }
     }
 }
