@@ -10,7 +10,7 @@ internal class ConfigCache {
     init(fetcher: Fetcher,
          poller: Poller,
          cacheUrl: URL = FileManager.getCacheDirectory().appendingPathComponent("rrc-config.plist"),
-         initialCacheContents: [String: Any]? = nil,
+         initialCacheContents: Data? = nil,
          keyStore: KeyStore = KeyStore(),
          verifier: Verifier = Verifier()) {
         self.fetcher = fetcher
@@ -20,8 +20,7 @@ internal class ConfigCache {
         self.keyStore = keyStore
         self.verifier = verifier
 
-        if let initialCacheContents = initialCacheContents,
-            let data = try? JSONSerialization.data(withJSONObject: ["body": initialCacheContents], options: []) {
+        if let data = initialCacheContents {
             self.activeConfig = ConfigModel(data: data)
         }
         DispatchQueue.global(qos: .utility).async {

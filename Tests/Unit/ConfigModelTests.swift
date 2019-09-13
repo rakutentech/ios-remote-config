@@ -6,9 +6,7 @@ class ConfigModelSpec: QuickSpec {
     override func spec() {
         context("initialization") {
             describe("when json is the expected format") {
-                let data = """
-                    {"body":{"key1":"val1","key2":"val2","key3":"val3"},"keyId":"a1b2c3"}
-                    """.data(using: .utf8) ?? Data()
+                let data = #"{"body":{"key1":"val1","key2":"val2","key3":"val3"},"keyId":"a1b2c3"}"#.data(using: .utf8) ?? Data()
                 let config = ConfigModel(data: data)
 
                 it("stores the original data in the jsonData property") {
@@ -35,9 +33,7 @@ class ConfigModelSpec: QuickSpec {
                 }
 
                 it("returns nil when json does not have a body object") {
-                    let dataString = """
-                    "key1":"val1","key2":"val2","key3":"val3","keyId":"a1b2c3"
-                    """
+                    let dataString = #""key1":"val1","key2":"val2","key3":"val3","keyId":"a1b2c3""#
                     let config = ConfigModel(data: dataString.data(using: .utf8) ?? Data())
 
                     expect(config).to(beNil())
@@ -50,9 +46,7 @@ class ConfigModelSpec: QuickSpec {
 
                     """.data(using: .utf8) ?? Data()
                     let config = ConfigModel(data: dataWithNewline)
-                    let dataWithoutNewline = """
-                    {"body":{"key1":"val1","key2":"val2","key3":"val3"},"keyId":"a1b2c3"}
-                    """.data(using: .utf8)
+                    let dataWithoutNewline = #"{"body":{"key1":"val1","key2":"val2","key3":"val3"},"keyId":"a1b2c3"}"#.data(using: .utf8)
 
                     expect(config?.jsonData).to(equal(dataWithoutNewline))
                 }

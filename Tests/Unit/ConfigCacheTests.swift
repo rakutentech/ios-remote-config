@@ -91,7 +91,7 @@ class ConfigCacheSpec: QuickSpec {
             let fetcher = Fetcher(client: APIClient(), environment: Environment())
 
             it("returns the value from config when key exists in config") {
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["foo": "bar"])
+                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: #"{"body":{"foo":"bar"},"keyId":"fooKey"}"#.data(using: .utf8))
 
                 let value = configCache.getString("foo", "not found")
 
@@ -99,7 +99,7 @@ class ConfigCacheSpec: QuickSpec {
             }
 
             it("returns the fallback when key is not found in config") {
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["moo": "bar"])
+                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: #"{"body":{"moo":"bar"},"keyId":"fooKey"}"#.data(using: .utf8))
                 let fallback = "not found"
 
                 let value = configCache.getString("foo", fallback)
@@ -120,7 +120,7 @@ class ConfigCacheSpec: QuickSpec {
             let fetcher = Fetcher(client: APIClient(), environment: Environment())
 
             it("returns the value from config when key exists") {
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["foo": "true"])
+                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: #"{"body":{"foo":"true"},"keyId":"fooKey"}"#.data(using: .utf8))
 
                 let value = configCache.getBoolean("foo", false)
 
@@ -129,7 +129,7 @@ class ConfigCacheSpec: QuickSpec {
 
             it("returns the fallback when key is not found in config") {
                 let fetcher = Fetcher(client: APIClient(), environment: Environment())
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["moo": "true"])
+                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: #"{"body":{"moo":"true"},"keyId":"fooKey"}"#.data(using: .utf8))
                 let fallback = false
 
                 let value = configCache.getBoolean("foo", fallback)
@@ -151,7 +151,7 @@ class ConfigCacheSpec: QuickSpec {
             let fetcher = Fetcher(client: APIClient(), environment: Environment())
 
             it("returns value that can be treated as int from config") {
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["foo": "10"])
+                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: #"{"body":{"foo":"10"},"keyId":"fooKey"}"#.data(using: .utf8))
 
                 let value = configCache.getNumber("foo", 5)
 
@@ -159,7 +159,7 @@ class ConfigCacheSpec: QuickSpec {
             }
 
             it("returns value that can be treated as double from config") {
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["foo": "10.123"])
+                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: #"{"body":{"foo":"10.123"},"keyId":"fooKey"}"#.data(using: .utf8))
 
                 let value = configCache.getNumber("foo", 5.0)
 
@@ -167,7 +167,7 @@ class ConfigCacheSpec: QuickSpec {
             }
 
             it("returns value that can be treated as float from config") {
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["foo": "10.123"])
+                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: #"{"body":{"foo":"10.123"},"keyId":"fooKey"}"#.data(using: .utf8))
 
                 let value = configCache.getNumber("foo", 5.5)
 
@@ -175,7 +175,7 @@ class ConfigCacheSpec: QuickSpec {
             }
 
             it("returns value that can be treated as uint8 (byte) from config") {
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["foo": "254"])
+                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: #"{"body":{"foo":"254"},"keyId":"fooKey"}"#.data(using: .utf8))
 
                 let value = configCache.getNumber("foo", 10)
 
@@ -183,7 +183,7 @@ class ConfigCacheSpec: QuickSpec {
             }
 
             it("returns fallback when value string cannot be converted to a number") {
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["foo": "bar"])
+                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: #"{"body":{"foo":"bar"},"keyId":"fooKey"}"#.data(using: .utf8))
 
                 let value = configCache.getNumber("foo", 5)
 
@@ -191,7 +191,7 @@ class ConfigCacheSpec: QuickSpec {
             }
 
             it("returns fallback when key is not found in config") {
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["moo": "10"])
+                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: #"{"body":{"moo":"10"},"keyId":"fooKey"}"#.data(using: .utf8))
 
                 let value = configCache.getNumber("foo", 5)
 
@@ -218,7 +218,7 @@ class ConfigCacheSpec: QuickSpec {
             }
 
             it("returns dictionary contents when config is non-empty") {
-                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: ["moo": "10", "foo": "coo"])
+                let configCache = ConfigCache(fetcher: fetcher, poller: Poller(), initialCacheContents: #"{"body":{"moo":"10","foo":"coo"},"keyId":"fooKey"}"#.data(using: .utf8))
 
                 let value = configCache.getConfig()
 
@@ -226,7 +226,7 @@ class ConfigCacheSpec: QuickSpec {
             }
         }
         describe("refreshFromRemote function") {
-            let jsonData = (try? JSONSerialization.data(withJSONObject: ["body": ["foo": "bar"], "keyId": "aKey"], options: []))!
+            let jsonData = #"{"body":{"foo":"bar"},"keyId":"aKey"}"#.data(using: .utf8)!
             let fetcher = FetcherMock(client: APIClient(), environment: Environment())
             let configCache = ConfigCache(fetcher: fetcher, poller: Poller())
             let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("bar")
@@ -303,7 +303,7 @@ class ConfigCacheSpec: QuickSpec {
                 }
 
                 it("adds the key after fetching it") {
-                    let jsonData = (try? JSONSerialization.data(withJSONObject: ["id": "aKey", "key": "123", "createdAt": ""], options: []))!
+                    let jsonData = #"{"id":"aKey","key":"123","createdAt":""}"#.data(using: .utf8)!
                     fetcher.fetchedKey = KeyModel(data: jsonData)
 
                     configCache.refreshFromRemote()

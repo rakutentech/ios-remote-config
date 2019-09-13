@@ -22,9 +22,14 @@ internal struct ConfigModel: Parsable {
             return nil
         }
 
+        guard let config = dictionary?["body"] as? ConfigDictionary,
+            let keyId = dictionary?["keyId"] as? String else {
+            return nil
+        }
+
         self.jsonData = jsonData.trailingNewlineTrimmed()
-        self.config = dictionary?["body"] as? ConfigDictionary ?? [:]
-        self.keyId = dictionary?["keyId"] as? String ?? ""
+        self.config =  config
+        self.keyId =  keyId
     }
 }
 
@@ -46,7 +51,7 @@ internal struct KeyModel: Decodable, Parsable {
     }
 }
 
-extension Data {
+fileprivate extension Data {
     mutating func trailingNewlineTrimmed() -> Data {
         let data = self
         guard let dataString = String(data: data, encoding: .utf8) else {
