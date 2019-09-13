@@ -20,3 +20,6 @@ Pods
 /fastlane/report.xml
 /fastlane/README.md
 /fastlane/.env
+
+# Jazzy-generated documentation
+docs/

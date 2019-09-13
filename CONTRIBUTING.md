@@ -4,6 +4,8 @@
 
 If you find a bug in the source code, or want to make a suggestion, you can help us by submitting an issue to our GitHub Repository. Even better, you could submit a Pull Request.
 
+**Considering making your first Pull Request?** You can learn how from this *free* series [How to Contribute to an Open Source Project on GitHub](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github)
+
 ## Pull Requests
 
 1. Fork the project
