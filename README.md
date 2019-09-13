@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/rakutentech/ios-remote-config.svg?branch=master)](https://travis-ci.org/rakutentech/ios-remote-config)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
 
 # Remote Config
 
@@ -37,14 +39,16 @@ Currently we do not host any public APIs but you can create your own APIs and co
 To use the module you must set the following values in your app's `Info.plist`.
 
 | Key | Value |
-| --- | --- |
+| :---: | :---: |
 | `RASApplicationIdentifier` | your_app_id |
 | `RASProjectSubscriptionKey` | your_subscription_key |
 | `RRCConfigAPIEndpoint` | https://www.example.com |
 
 ### Get config values
 
-**Note**: newly fetched config values will not be available until the next app launch. This means that in the first session after app install the fallback values will be used instead of fetched values.
+- Attention: Newly fetched config values will not be available until the next app launch. This means that in the first session after app install the fallback values will be used instead of fetched values.
+
+#### Code examples
 
         // Get a String value
         let testString = RemoteConfig.getString(key: "stringKeyName", fallback: "string_fallback_value")
