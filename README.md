@@ -38,8 +38,8 @@ Currently we do not host any public APIs but you can create your own APIs and co
 
 To use the module you must set the following values in your app's `Info.plist`.
 
-| Key | Value |
-| :---: | :---: |
+| Key     | Value     |
+| :---:   | :---:     |
 | `RASApplicationIdentifier` | your_app_id |
 | `RASProjectSubscriptionKey` | your_subscription_key |
 | `RRCConfigAPIEndpoint` | https://www.example.com |
@@ -62,16 +62,17 @@ To use the module you must set the following values in your app's `Info.plist`.
         // Get the entire config as a dictionary
         let configDictionary = RemoteConfig.getConfig()
 
-## Running the sample app and unit tests
+## Contributing
 
+See CONTRIBUTING.md for details of how to participate in development of the module.
+
+#### Running the sample app and unit tests
+
+- Clone or fork the repo
 - Run `bundle exec pod install` in the repo root folder
 - Open `RRemoteConfig.xcworkspace` in Xcode
 - Select the `SampleApp` scheme then build/run
 - To run the tests press key shortcut command-U
-
-## Contributing
-
-See CONTRIBUTING.md for details of how to participate in development of the module.
 
 ## Changelog
 
