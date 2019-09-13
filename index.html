@@ -55,15 +55,23 @@
           <section class="section">
             
             <p><a href="https://travis-ci.org/rakutentech/ios-remote-config"><img src="https://travis-ci.org/rakutentech/ios-remote-config.svg?branch=master" alt="Build Status"></a>
-<a href="https://codecov.io/gh/rakutentech/ios-remote-config"><img src="https://codecov.io/gh/rakutentech/ios-remote-config/branch/master/graph/badge.svg" alt="codecov"></a></p>
+<a href="http://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome"></a></p>
 <h1 id='remote-config' class='heading'>Remote Config</h1>
 
-<p>The <strong>Remote Config</strong> module is a tool that provides remote configuration for iOS applications.</p>
+<p>Provides remote configuration for iOS applications.</p>
 <h2 id='how-it-works' class='heading'>How it works</h2>
+
+<p>The module fetches a JSON config from the backend API at launch time and caches the config locally if the payload signature verification succeeds. The config is fetched and cached every 60 minutes.</p>
 <h2 id='getting-started' class='heading'>Getting started</h2>
+<h3 id='requirements' class='heading'>Requirements</h3>
 
 <p>This module supports iOS 10.0 and above. It has been tested on iOS 10.0 and above.</p>
-<h3 id='installing-as-cocoapods-pod' class='heading'>Installing as CocoaPods pod</h3>
+
+<p>It is written in Swift 5.0 and can be used in compatible Xcode versions.</p>
+<h3 id='documentation' class='heading'>Documentation</h3>
+
+<p>Generated documentation for the module is hosted on rakutentech&rsquo;s GitHub site <a href="https://rakutentech.github.io/ios-remote-config">https://rakutentech.github.io/ios-remote-config</a>.</p>
+<h3 id='installing' class='heading'>Installing</h3>
 
 <p>To use the module your <code>Podfile</code> should contain:</p>
 <pre class="highlight plaintext"><code>source 'https://github.com/CocoaPods/Specs.git'
@@ -74,19 +82,69 @@ pod 'RRemoteConfig'
 <p>Run <code>pod install</code> to install the module and its dependencies.</p>
 <h3 id='configuring' class='heading'>Configuring</h3>
 
-<p>Currently we do not host any public Remote Config backend APIs but you can create your own APIs and configure the SDK to use those.</p>
+<p>Currently we do not host any public APIs but you can create your own APIs and configure the SDK to use those.</p>
+
+<p>To use the module you must set the following values in your app&rsquo;s <code>Info.plist</code>.</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Key</th>
+<th style="text-align: center">Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center"><code>RASApplicationIdentifier</code></td>
+<td style="text-align: center">your_app_id</td>
+</tr>
+<tr>
+<td style="text-align: center"><code>RASProjectSubscriptionKey</code></td>
+<td style="text-align: center">your_subscription_key</td>
+</tr>
+<tr>
+<td style="text-align: center"><code>RRCConfigAPIEndpoint</code></td>
+<td style="text-align: center"><a href="https://www.example.com">https://www.example.com</a></td>
+</tr>
+</tbody></table>
+<h3 id='get-config-values' class='heading'>Get config values</h3>
+<div class="aside aside-attention">
+    <p class="aside-title">Attention</p>
+    Newly fetched config values will not be available until the next app launch. This means that in the first session after app install the fallback values will be used instead of fetched values.
+
+</div>
+<h4 id='code-examples' class='heading'>Code examples</h4>
+<pre class="highlight plaintext"><code>    // Get a String value
+    let testString = RemoteConfig.getString(key: "stringKeyName", fallback: "string_fallback_value")
+
+    // Get a Boolean value
+    let testBoolean = RemoteConfig.getBoolean(key: "booleanKeyName", fallback: false)
+
+    // Get a NSNumber value
+    let testNumber = RemoteConfig.getNumber(key: "numberKeyName", fallback: 1)
+
+    // Get the entire config as a dictionary
+    let configDictionary = RemoteConfig.getConfig()
+</code></pre>
 <h2 id='contributing' class='heading'>Contributing</h2>
 
-<p>See the <a href="CONTRIBUTING.md">contributing guide</a> for details of how to participate in development of the module.</p>
+<p>See CONTRIBUTING.md for details of how to participate in development of the module.</p>
+<h4 id='running-the-sample-app-and-unit-tests' class='heading'>Running the sample app and unit tests</h4>
+
+<ul>
+<li>Clone or fork the repo</li>
+<li>Run <code>bundle exec pod install</code> in the repo root folder</li>
+<li>Open <code>RRemoteConfig.xcworkspace</code> in Xcode</li>
+<li>Select the <code>SampleApp</code> scheme then build/run</li>
+<li>To run the tests press key shortcut command-U</li>
+</ul>
 <h2 id='changelog' class='heading'>Changelog</h2>
 
-<p>See the <a href="CHANGELOG.md">changelog</a> for the new features, changes and bug fixes of the module versions.</p>
+<p>See CHANGELOG.md for the new features, changes and bug fixes of the module versions.</p>
 
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2019 <a class="link" href="https://github.com/rakutentech/ios-remoteconfig" target="_blank" rel="external">Rakuten Ecosystem Mobile</a>. All rights reserved. (Last updated: 2019-09-11)</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.10.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+          <p>&copy; 2019 <a class="link" href="https://github.com/rakutentech/ios-remoteconfig" target="_blank" rel="external">Rakuten Ecosystem Mobile</a>. All rights reserved. (Last updated: 2019-09-13)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.11.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
         </section>
       </article>
     </div>
