@@ -1,14 +1,15 @@
 Pod::Spec.new do |s|
   s.name         = "RRemoteConfig"
-  s.version      = "0.0.1"
+  s.version      = "1.0.0"
   s.authors      = "Rakuten Ecosystem Mobile"
   s.summary      = "Rakuten's Remote Config module."
-  s.homepage     = "https://github.com/rakutentech/ios-remoteconfig"
+  s.homepage     = "https://github.com/rakutentech/ios-remote-config"
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
-  s.source       = { :git => "https://github.com/rakutentech/ios-remoteconfig.git", :tag => s.version.to_s }
+  s.source       = { :git => "https://github.com/rakutentech/ios-remote-config.git", :tag => s.version.to_s }
   s.platform     = :ios, '10.0'
+  s.swift_version = '5.0'
   s.requires_arc = true
-  s.documentation_url = "https://github.com/rakutentech/ios-remoteconfig"
+  s.documentation_url = "https://rakutentech.github.io/ios-remote-config/"
   s.pod_target_xcconfig = {
     'CLANG_ENABLE_MODULES'                                  => 'YES',
     'CLANG_MODULES_AUTOLINK'                                => 'YES',
