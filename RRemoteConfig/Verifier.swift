@@ -33,7 +33,7 @@ internal class Verifier {
 
         var error: Unmanaged<CFError>?
         guard let secKey = SecKeyCreateWithData(secKeyData as CFData, attributes as CFDictionary, &error) else {
-            if let err = error as? Error {
+            if let err = error?.takeRetainedValue() {
                 Logger.e(err.localizedDescription)
             }
             return nil

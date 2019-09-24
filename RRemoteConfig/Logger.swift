@@ -20,6 +20,8 @@ internal class Logger {
     /// Verbose
     class func v(_ message: String) {
         #if DEBUG
+        // Disabled by default to prevent spamming apps with verbose logging.
+        // In future this could be made switchable via plist.
         //print("🔍 \(message)")
         #endif
     }

@@ -145,12 +145,11 @@ class FetcherSpec: QuickSpec {
             }
 
             context("when valid config model is received as the result from the api client") {
+                let dataString = #"{"body":{"foo":"bar"},"keyId":"fooKey"}"#
+
                 it("will set the config dictionary in the result passed to the completion handler") {
                     var testResult: Any?
                     let apiClientMock = APIClientMock()
-                    let dataString = """
-                        {"body":{"foo":"bar"}}
-                        """
                     apiClientMock.data = dataString.data(using: .utf8)
                     let fetcher = Fetcher(client: apiClientMock, environment: Environment())
 
@@ -164,9 +163,6 @@ class FetcherSpec: QuickSpec {
                 it("will set the signature in the result passed to the completion handler") {
                     var testResult: Any?
                     let apiClientMock = APIClientMock()
-                    let dataString = """
-                        {"body":{"foo":"bar"}}
-                        """
                     apiClientMock.data = dataString.data(using: .utf8)
                     apiClientMock.headers = ["Signature": "a-sig"]
                     let fetcher = Fetcher(client: apiClientMock, environment: Environment())
@@ -182,9 +178,6 @@ class FetcherSpec: QuickSpec {
                     UserDefaults.standard.removeObject(forKey: Environment.etagKey)
                     let apiClientMock = APIClientMock()
                     let env = Environment()
-                    let dataString = """
-                        {"body":{"foo":"bar"}}
-                        """
                     apiClientMock.data = dataString.data(using: .utf8)
                     apiClientMock.headers = ["Etag": "an-etag"]
                     let fetcher = Fetcher(client: apiClientMock, environment: env)

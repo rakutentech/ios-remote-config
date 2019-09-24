@@ -110,16 +110,16 @@ class APIClientMock: APIClient {
     override func send<T>(request: URLRequest, parser: T.Type, completionHandler: @escaping (Result<Response, Error>) -> Void) where T: Parsable {
         self.request = request
 
-        guard let data = data else {
+        guard let data = data, let url = request.url else {
             return completionHandler(.failure(error ?? NSError(domain: "Test", code: 0, userInfo: nil)))
         }
-        if let httpResponse = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: "1.1", headerFields: headers),
+        if let httpResponse = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "1.1", headerFields: headers),
             let object = parser.init(data: data) {
             return completionHandler(.success(Response(object, httpResponse)))
         }
     }
 }
 
-func createCacheMock(initialContents: [String: Any] = ["body": ["": ""]]) -> CacheMock {
+func createCacheMock(initialContents: Data? = #"{"body":{"":""},"keyId":"fooKey"}"#.data(using: .utf8)) -> CacheMock {
     return CacheMock(fetcher: Fetcher(client: APIClient(), environment: Environment()), poller: Poller(), initialCacheContents: initialContents)
 }
