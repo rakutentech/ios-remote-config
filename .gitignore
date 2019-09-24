@@ -23,3 +23,6 @@ Pods
 
 # Jazzy-generated documentation
 docs/
+
+# Always use latest gems
+Gemfile.lock
