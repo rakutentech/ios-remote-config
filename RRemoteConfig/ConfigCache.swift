@@ -24,6 +24,13 @@ internal class ConfigCache {
             self.activeConfig = ConfigModel(data: data)
         }
         DispatchQueue.global(qos: .utility).async {
+            let defaults = UserDefaults.standard
+            let firstLaunch = "first_launch"
+            if defaults.string(forKey: firstLaunch) == nil {
+                defaults.set("true", forKey: firstLaunch)
+                keyStore.empty()
+            }
+
             if let dictionary = NSDictionary.init(contentsOf: self.cacheUrl) as? [String: Any] {
                 Logger.v("Config read from cache plist \(cacheUrl): \(dictionary)")
 

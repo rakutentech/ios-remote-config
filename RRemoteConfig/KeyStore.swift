@@ -1,41 +1,49 @@
 internal class KeyStore {
     let service: String
+    var account: String
+
+    typealias KeysDictionary = [String: String]
 
     init(service: String = Bundle.main.bundleIdentifier!) {
         self.service = service
+        self.account = "\(service).keys"
     }
 
     func key(for keyId: String) -> String? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: keyId,
-            kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne
-        ]
-
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-
-        guard status == errSecSuccess, let objectData = result as? Data else {
-            return nil
-        }
-
-        let key = String(data: objectData, encoding: .utf8)
-        Logger.v("Key id \(keyId) matched to key \(String(describing: key))")
-        return key
+        return keys()?[keyId]
     }
 
     func addKey(key: String, for keyId: String) {
+        var keysDic = keys()
+        guard keysDic?[keyId] == nil else {
+            return // key exists
+        }
+
+        if keysDic != nil {
+            keysDic?[keyId] = key
+        } else {
+            keysDic = [keyId: key]
+        }
+
+        if let keys = keysDic {
+            write(keys: keys)
+        }
+    }
+
+    func empty() {
+        write(keys: [:])
+    }
+
+    private func write(keys: KeysDictionary) {
+        guard let data = try? JSONSerialization.data(withJSONObject: keys, options: []) else {
+            return
+        }
+
         let queryFind: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
-            kSecAttrAccount as String: keyId
+            kSecAttrAccount as String: account
         ]
-
-        guard let data = key.data(using: .utf8) else {
-            return
-        }
 
         let update: [String: Any] = [
             kSecValueData as String: data
@@ -47,9 +55,9 @@ internal class KeyStore {
             let queryAdd: [String: Any] = [
                 kSecClass as String: kSecClassGenericPassword,
                 kSecAttrService as String: service,
-                kSecAttrAccount as String: keyId,
+                kSecAttrAccount as String: account,
                 kSecValueData as String: data,
-                kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+                kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
             ]
             status = SecItemAdd(queryAdd as CFDictionary, nil)
         }
@@ -61,7 +69,30 @@ internal class KeyStore {
             } else {
                 error = "OSStatus \(status)"
             }
-            Logger.e("addKey error \(String(describing: error))")
+            Logger.e("KeyStore write error \(String(describing: error))")
         }
+    }
+
+    private func keys() -> KeysDictionary? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+
+        guard status == errSecSuccess, let objectData = result as? Data else {
+            return nil
+        }
+
+        guard let keys = try? JSONSerialization.jsonObject(with: objectData, options: []) as? KeysDictionary else {
+            return nil
+        }
+
+        return keys
     }
 }
