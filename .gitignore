@@ -26,3 +26,6 @@ docs/
 
 # Use latest gem versions
 Gemfile.lock
+
+# Mulitplatform
+/.gradle/

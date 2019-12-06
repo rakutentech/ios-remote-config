@@ -1,5 +1,8 @@
+import RemoteConfigShared
+
 internal class ConfigCache {
     let fetcher: Fetcher
+    let fetcher2: ConfigFetcher
     let poller: Poller
     let cacheUrl: URL
     let keyStore: KeyStore
@@ -8,12 +11,14 @@ internal class ConfigCache {
     private var numberFormatter: NumberFormatter
 
     init(fetcher: Fetcher,
+         fetcher2: ConfigFetcher,
          poller: Poller,
          cacheUrl: URL = FileManager.getCacheDirectory().appendingPathComponent("rrc-config.plist"),
          initialCacheContents: Data? = nil,
          keyStore: KeyStore = KeyStore(),
          verifier: Verifier = Verifier()) {
         self.fetcher = fetcher
+        self.fetcher2 = fetcher2
         self.poller = poller
         self.cacheUrl = cacheUrl
         self.numberFormatter = NumberFormatter()
@@ -53,7 +58,7 @@ internal class ConfigCache {
 
     func refreshFromRemote() {
         self.poller.start {
-            DispatchQueue.global(qos: .utility).async {
+            DispatchQueue.main.async {
                 self.fetchConfig()
             }
         }
@@ -89,10 +94,10 @@ internal class ConfigCache {
 
     // MARK: Private helpers
     fileprivate func fetchConfig() {
-        self.fetcher.fetchConfig { (result) in
-            guard let configModel = result else {
-                return Logger.e("Config could not be refreshed from remote")
-            }
+        self.fetcher2.fetch() { (result) in
+            let body = result.rawBody as String
+            var configModel = ConfigModel(data: body.data(using: .utf8)!)!
+            configModel.signature = result.signature
             self.verifyContents(model: configModel, resultHandler: { (verified) in
                 if verified {
                     let dictionary = [
