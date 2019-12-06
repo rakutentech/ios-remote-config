@@ -1,9 +1,12 @@
+import RemoteConfigShared
+
 internal class RealRemoteConfig {
     static let shared = RealRemoteConfig()
     var environment: Environment
     var poller: Poller
     var apiClient: APIClient
     var fetcher: Fetcher
+    var fetcher2: ConfigFetcher
     var cache: ConfigCache
 
     init() {
@@ -11,7 +14,8 @@ internal class RealRemoteConfig {
         self.poller = Poller()
         self.apiClient = APIClient()
         self.fetcher = Fetcher(client: apiClient, environment: environment)
-        self.cache = ConfigCache(fetcher: fetcher, poller: poller)
+        self.fetcher2 = ConfigFetcher(baseUrl: self.environment.baseUrl!.absoluteString, appId: self.environment.appId, subscriptionKey: self.environment.subscriptionKey)
+        self.cache = ConfigCache(fetcher: fetcher, fetcher2: fetcher2, poller: poller)
     }
 
     func getString(_ key: String, _ fallback: String) -> String {
