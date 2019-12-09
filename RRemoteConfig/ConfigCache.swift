@@ -94,7 +94,7 @@ internal class ConfigCache {
 
     // MARK: Private helpers
     fileprivate func fetchConfig() {
-        self.fetcher2.fetch() { (result) in
+        self.fetcher2.fetch(response: { (result) in
             let body = result.rawBody as String
             var configModel = ConfigModel(data: body.data(using: .utf8)!)!
             configModel.signature = result.signature
@@ -109,7 +109,9 @@ internal class ConfigCache {
                     Logger.e("Fetched dictionary contents failed verification")
                 }
             })
-        }
+        }, error: { (exception) in
+            Logger.e("Failed to fetch config: " + exception.description())
+        })
     }
 
     fileprivate func write(_ config: [String: Any]) {
