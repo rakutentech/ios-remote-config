@@ -1,8 +1,7 @@
 import RemoteConfigShared
 
 internal class ConfigCache {
-    let fetcher: Fetcher
-    let fetcher2: ConfigFetcher
+    let apiClient: ConfigApiClient
     let poller: Poller
     let cacheUrl: URL
     let keyStore: KeyStore
@@ -10,15 +9,13 @@ internal class ConfigCache {
     private var activeConfig: ConfigModel?
     private var numberFormatter: NumberFormatter
 
-    init(fetcher: Fetcher,
-         fetcher2: ConfigFetcher,
+    init(apiClient: ConfigApiClient,
          poller: Poller,
          cacheUrl: URL = FileManager.getCacheDirectory().appendingPathComponent("rrc-config.plist"),
          initialCacheContents: Data? = nil,
          keyStore: KeyStore = KeyStore(),
          verifier: Verifier = Verifier()) {
-        self.fetcher = fetcher
-        self.fetcher2 = fetcher2
+        self.apiClient = apiClient
         self.poller = poller
         self.cacheUrl = cacheUrl
         self.numberFormatter = NumberFormatter()
@@ -94,7 +91,7 @@ internal class ConfigCache {
 
     // MARK: Private helpers
     fileprivate func fetchConfig() {
-        self.fetcher2.fetch(response: { (result) in
+        self.apiClient.fetchConfig(success: { (result) in
             let body = result.rawBody as String
             var configModel = ConfigModel(data: body.data(using: .utf8)!)!
             configModel.signature = result.signature
@@ -159,16 +156,15 @@ extension ConfigCache {
                                                 keyBase64: key)
             resultHandler(verified)
         } else {
-            fetcher.fetchKey(with: keyId) { (keyModel) in
-                guard let key = keyModel?.key, keyModel?.id == model.keyId else {
-                    return resultHandler(false)
-                }
+            apiClient.fetchPublicKey(keyId: keyId, success: { (key) in
                 self.keyStore.addKey(key: key, for: keyId)
                 let verified = self.verifier.verify(signatureBase64: signature,
-                                                    objectData: model.jsonData,
-                                                    keyBase64: key)
+                        objectData: model.jsonData,
+                        keyBase64: key)
                 resultHandler(verified)
-            }
+            }, error: { (error) in
+                resultHandler(false)
+            })
         }
     }
 }

@@ -4,18 +4,24 @@ internal class RealRemoteConfig {
     static let shared = RealRemoteConfig()
     var environment: Environment
     var poller: Poller
-    var apiClient: APIClient
-    var fetcher: Fetcher
-    var fetcher2: ConfigFetcher
+    var apiClient: ConfigApiClient
     var cache: ConfigCache
 
     init() {
         self.environment = Environment()
+        self.apiClient = ConfigApiClient(
+            platformClient: ConfigApiClientKt.createHttpClient(),
+            baseUrl: self.environment.baseUrl!.absoluteString,
+            appId: self.environment.appId,
+            subscriptionKey: self.environment.subscriptionKey,
+            deviceModel: self.environment.deviceModel,
+            osVersion: self.environment.osVersion,
+            appName: self.environment.appName,
+            appVersion: self.environment.appVersion,
+            sdkVersion: self.environment.sdkVersion
+        )
         self.poller = Poller()
-        self.apiClient = APIClient()
-        self.fetcher = Fetcher(client: apiClient, environment: environment)
-        self.fetcher2 = ConfigFetcher(baseUrl: self.environment.baseUrl!.absoluteString, appId: self.environment.appId, subscriptionKey: self.environment.subscriptionKey)
-        self.cache = ConfigCache(fetcher: fetcher, fetcher2: fetcher2, poller: poller)
+        self.cache = ConfigCache(apiClient: apiClient, poller: poller)
     }
 
     func getString(_ key: String, _ fallback: String) -> String {
