@@ -1,4 +1,5 @@
 @testable import RRemoteConfig
+@testable import RemoteConfigShared
 
 class BundleMock: EnvironmentSetupProtocol {
     var mockAppId: String?
@@ -60,20 +61,47 @@ class CacheMock: ConfigCache {
     }
 }
 
-class FetcherMock: Fetcher {
+class ConfigApiClientMock: ConfigApiClient {
     var fetchConfigCalledNumTimes = 0
     var fetchKeyCalledNumTimes = 0
-    var fetchedConfig = ConfigModel(data: (try? JSONSerialization.data(withJSONObject: ["": ""], options: []))!)
-    var fetchedKey = KeyModel(data: (try? JSONSerialization.data(withJSONObject: ["id": "", "key": "", "createdAt": ""], options: []))!)
+    var fetchedConfig = Config(
+        rawBody: "{}",
+        body: ["": ""],
+        signature: "",
+        keyId: ""
+    )
+    var fetchedKey = ""
 
-    override func fetchConfig(completionHandler: @escaping (ConfigModel?) -> Void) {
-        fetchConfigCalledNumTimes += 1
-        completionHandler(fetchedConfig)
+    override init(platformClient: Ktor_client_coreHttpClient = ConfigApiClientKt.createHttpClient(),
+         baseUrl: String = "https://www.example.com",
+         appId: String = "test_app_id",
+         subscriptionKey: String = "test_subscription_key",
+         deviceModel: String = "test_device_model",
+         osVersion: String = "test_os_version",
+         appName: String = "test_app_name",
+         appVersion: String = "test_app_version",
+         sdkVersion: String = "test_sdk_version") {
+        super.init(
+            platformClient: platformClient,
+            baseUrl: baseUrl,
+            appId: appId,
+            subscriptionKey: subscriptionKey,
+            deviceModel: deviceModel,
+            osVersion: osVersion,
+            appName: appName,
+            appVersion: appVersion,
+            sdkVersion: sdkVersion
+        )
     }
 
-    override func fetchKey(with keyId: String, completionHandler: @escaping (KeyModel?) -> Void) {
+    override func fetchConfig(success: @escaping (Config) -> Void, error: @escaping (KotlinException) -> Void) {
+        fetchConfigCalledNumTimes += 1
+        success(fetchedConfig)
+    }
+
+    override func fetchPublicKey(keyId: String, success: @escaping (String) -> Void, error: @escaping (KotlinException) -> Void) {
         fetchKeyCalledNumTimes += 1
-        completionHandler(fetchedKey)
+        success(fetchedKey)
     }
 }
 
@@ -101,25 +129,6 @@ class KeyStoreMock: KeyStore {
     }
 }
 
-class APIClientMock: APIClient {
-    var data: Data?
-    var headers: [String: String]?
-    var error: Error?
-    var request: URLRequest?
-
-    override func send<T>(request: URLRequest, parser: T.Type, completionHandler: @escaping (Result<Response, Error>) -> Void) where T: Parsable {
-        self.request = request
-
-        guard let data = data, let url = request.url else {
-            return completionHandler(.failure(error ?? NSError(domain: "Test", code: 0, userInfo: nil)))
-        }
-        if let httpResponse = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "1.1", headerFields: headers),
-            let object = parser.init(data: data) {
-            return completionHandler(.success(Response(object, httpResponse)))
-        }
-    }
-}
-
 func createCacheMock(initialContents: Data? = #"{"body":{"":""},"keyId":"fooKey"}"#.data(using: .utf8)) -> CacheMock {
-    return CacheMock(fetcher: Fetcher(client: APIClient(), environment: Environment()), poller: Poller(), initialCacheContents: initialContents)
+    return CacheMock(apiClient: ConfigApiClientMock(), poller: Poller(), initialCacheContents: initialContents)
 }
