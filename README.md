@@ -2,13 +2,9 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 
-# Remote Config
+# Remote Config (Kotlin Multiplatform POC)
 
-Provides remote configuration for iOS applications.
-
-## How it works
-
-The module fetches a JSON config from the backend API at launch time and caches the config locally if the payload signature verification succeeds. The config is fetched and cached every 60 minutes.
+Provides remote configuration for iOS applications. The networking part of the module is provided by a Kotlin Multiplatform framework.
 
 ## Getting started
 
@@ -69,6 +65,9 @@ See CONTRIBUTING.md for details of how to participate in development of the modu
 #### Running the sample app and unit tests
 
 - Clone or fork the repo
+- Run `git submodule update --init` in the root which will populate the `shared` folder
+- Run `cd shared` then run `git submodule update --init` to populate the `config` folder
+- Run `./gradlew linkRemoteConfigSharedDebugFrameworkIos` to create the shared networking framework `build/bin/ios/RemoteConfigSharedDebugFramework/RemoteConfigShared.framework`
 - Run `bundle exec pod install` in the repo root folder
 - Open `RRemoteConfig.xcworkspace` in Xcode
 - Select the `SampleApp` scheme then build/run

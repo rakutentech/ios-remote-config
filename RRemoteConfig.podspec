@@ -26,5 +26,6 @@ Pod::Spec.new do |s|
     'Foundation',
   ]
   s.source_files = "RRemoteConfig/**/*.{Swift,m}"
+  s.vendored_frameworks = 'shared/build/bin/ios/RemoteConfigSharedDebugFramework/RemoteConfigShared.framework'
 end
 # vim:syntax=ruby:et:sts=2:sw=2:ts=2:ff=unix:
