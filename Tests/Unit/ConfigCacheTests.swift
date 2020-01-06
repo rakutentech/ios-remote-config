@@ -248,7 +248,7 @@ class ConfigCacheSpec: QuickSpec {
             }
 
             describe("when the verification key is found locally") {
-                mockApiClient.fetchedConfig = Config(rawBody: jsonData, body: ["":""], signature: "aSig", keyId: "")
+                mockApiClient.fetchedConfig = Config(rawBody: jsonData, body: ["": ""], signature: "aSig", keyId: "")
                 let configCache = ConfigCache(apiClient: mockApiClient,
                                               poller: Poller(),
                                               cacheUrl: url,
@@ -283,7 +283,7 @@ class ConfigCacheSpec: QuickSpec {
                 }
             }
             describe("when the verification key is not found locally") {
-                mockApiClient.fetchedConfig = Config(rawBody: jsonData, body: ["":""], signature: "aSig", keyId: "")
+                mockApiClient.fetchedConfig = Config(rawBody: jsonData, body: ["": ""], signature: "aSig", keyId: "")
                 let keyStore = KeyStoreMock(contents: [:])
                 let configCache = ConfigCache(apiClient: mockApiClient,
                                               poller: Poller(),

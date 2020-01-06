@@ -73,14 +73,14 @@ class ConfigApiClientMock: ConfigApiClient {
     var fetchedKey = ""
 
     override init(platformClient: Ktor_client_coreHttpClient = ConfigApiClientKt.createHttpClient(),
-         baseUrl: String = "https://www.example.com",
-         appId: String = "test_app_id",
-         subscriptionKey: String = "test_subscription_key",
-         deviceModel: String = "test_device_model",
-         osVersion: String = "test_os_version",
-         appName: String = "test_app_name",
-         appVersion: String = "test_app_version",
-         sdkVersion: String = "test_sdk_version") {
+                  baseUrl: String = "https://www.example.com",
+                  appId: String = "test_app_id",
+                  subscriptionKey: String = "test_subscription_key",
+                  deviceModel: String = "test_device_model",
+                  osVersion: String = "test_os_version",
+                  appName: String = "test_app_name",
+                  appVersion: String = "test_app_version",
+                  sdkVersion: String = "test_sdk_version") {
         super.init(
             platformClient: platformClient,
             baseUrl: baseUrl,

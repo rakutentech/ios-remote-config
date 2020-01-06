@@ -162,7 +162,7 @@ extension ConfigCache {
                         objectData: model.jsonData,
                         keyBase64: key)
                 resultHandler(verified)
-            }, error: { (error) in
+            }, error: { (_) in
                 resultHandler(false)
             })
         }
