@@ -1,7 +1,7 @@
 PODS:
   - Nimble (8.0.1)
   - Quick (2.1.0)
-  - RRemoteConfig (0.0.1)
+  - RRemoteConfig (1.0.0)
 
 DEPENDENCIES:
   - Nimble
@@ -9,7 +9,7 @@ DEPENDENCIES:
   - RRemoteConfig (from `./RRemoteConfig.podspec`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
     - Nimble
     - Quick
 
@@ -20,8 +20,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Nimble: 45f786ae66faa9a709624227fae502db55a8bdd0
   Quick: 4be43f6634acfa727dd106bdf3929ce125ffa79d
-  RRemoteConfig: b66577f1993fc685627593fdcc315ef67b38a6be
+  RRemoteConfig: 1ac19c32c349550cc262e2a98d0144b9d876aea6
 
-PODFILE CHECKSUM: 1046c0078aa49254b1d3f058652b15ce93dcda12
+PODFILE CHECKSUM: 97f8a2d394861924b0c7524397cd0674e52a07fe
 
-COCOAPODS: 1.7.5
+COCOAPODS: 1.9.1

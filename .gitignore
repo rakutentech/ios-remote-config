@@ -24,5 +24,8 @@ Pods
 # Jazzy-generated documentation
 docs/
 
+# Gems
+.bundle/
+vendor/
 # Use latest gem versions
 Gemfile.lock
