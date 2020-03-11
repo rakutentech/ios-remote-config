@@ -9,7 +9,7 @@ before_install:
 - pod repo update
 
 script:
-- fastlane ci
+- travis_wait fastlane ci
 - bundle exec danger
 
 after_success:
