@@ -5,6 +5,8 @@ internal protocol EnvironmentSetupProtocol {
     func osVersion() -> String
     func sdkName() -> String
     func sdkVersion() -> String
+    func languageCode() -> String?
+    func countryCode() -> String?
 }
 
 internal class Environment {
@@ -24,17 +26,17 @@ internal class Environment {
             Logger.e("Ensure RASApplicationIdentifier value in plist is valid")
             return nil
         }
-        // GET /api/v1/app/{appId}/config?appVersion={appVersion}&osVersion={osVersion}&language={language}&country={country}
-        var queryItems: [URLQueryItem] = [URLQueryItem]()
+
+        var queryItems = [URLQueryItem]()
         queryItems.append(URLQueryItem(name: "appVersion", value: appVersion))
         queryItems.append(URLQueryItem(name: "osVersion", value: osVersion))
 
-        if let language = Locale.current.languageCode {
-            queryItems.append(URLQueryItem(name: "language", value: language))
+        if let language = languageCode {
+            queryItems.append(URLQueryItem(name: "language", value: language.lowercased()))
         }
 
-        if let country = Locale.current.regionCode {
-            queryItems.append(URLQueryItem(name: "country", value: country))
+        if let country = countryCode {
+            queryItems.append(URLQueryItem(name: "country", value: country.lowercased()))
         }
         components.queryItems = queryItems
         return components.url
@@ -62,6 +64,12 @@ internal class Environment {
     }
     var sdkVersion: String {
         return bundle.sdkVersion()
+    }
+    var languageCode: String? {
+        return bundle.languageCode()
+    }
+    var countryCode: String? {
+        return bundle.countryCode()
     }
     var etag: String? {
         get {
