@@ -10,6 +10,8 @@ class BundleMock: EnvironmentSetupProtocol {
     var mockOsVersion: String?
     var mockSdkName: String?
     var mockSdkVersion: String?
+    var mockLanguageCode: String?
+    var mockCountryCode: String?
     var mockNotFound: String?
 
     func value(for key: String) -> String? {
@@ -39,6 +41,10 @@ class BundleMock: EnvironmentSetupProtocol {
         return mockDeviceModel ?? valueNotFound
     }
 
+    func appVersion() -> String {
+        return mockAppVersion ?? valueNotFound
+    }
+
     func osVersion() -> String {
         return mockOsVersion ?? valueNotFound
     }
@@ -49,6 +55,14 @@ class BundleMock: EnvironmentSetupProtocol {
 
     func sdkVersion() -> String {
         return mockSdkVersion ?? valueNotFound
+    }
+
+    func languageCode() -> String? {
+        return mockLanguageCode ?? valueNotFound
+    }
+
+    func countryCode() -> String? {
+        return mockCountryCode ?? valueNotFound
     }
 }
 

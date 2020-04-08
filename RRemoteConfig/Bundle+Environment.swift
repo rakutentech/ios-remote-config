@@ -24,4 +24,12 @@ extension Bundle: EnvironmentSetupProtocol {
     func value(for key: String) -> String? {
         return self.object(forInfoDictionaryKey: key) as? String
     }
+
+    func languageCode() -> String? {
+        return Locale.current.languageCode
+    }
+
+    func countryCode() -> String? {
+        return Locale.current.regionCode
+    }
 }

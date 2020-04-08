@@ -5,6 +5,8 @@ internal protocol EnvironmentSetupProtocol {
     func osVersion() -> String
     func sdkName() -> String
     func sdkVersion() -> String
+    func languageCode() -> String?
+    func countryCode() -> String?
 }
 
 internal class Environment {
@@ -18,11 +20,26 @@ internal class Environment {
         return URL(string: "\(endpointUrlString)")
     }
     var configUrl: URL? {
-        guard let appId = bundle.value(for: "RASApplicationIdentifier") else {
+        guard let appId = bundle.value(for: "RASApplicationIdentifier"),
+            let path = baseUrl?.appendingPathComponent("/app/\(appId)/config"),
+            var components = URLComponents(url: path, resolvingAgainstBaseURL: true) else {
             Logger.e("Ensure RASApplicationIdentifier value in plist is valid")
             return nil
         }
-        return baseUrl?.appendingPathComponent("/app/\(appId)/config")
+
+        var queryItems = [URLQueryItem]()
+        queryItems.append(URLQueryItem(name: "appVersion", value: appVersion))
+        queryItems.append(URLQueryItem(name: "osVersion", value: osVersion))
+
+        if let language = languageCode {
+            queryItems.append(URLQueryItem(name: "language", value: language.lowercased()))
+        }
+
+        if let country = countryCode {
+            queryItems.append(URLQueryItem(name: "country", value: country.lowercased()))
+        }
+        components.queryItems = queryItems
+        return components.url
     }
     var subscriptionKey: String {
         return bundle.value(for: "RASProjectSubscriptionKey") ?? bundle.valueNotFound
@@ -47,6 +64,12 @@ internal class Environment {
     }
     var sdkVersion: String {
         return bundle.sdkVersion()
+    }
+    var languageCode: String? {
+        return bundle.languageCode()
+    }
+    var countryCode: String? {
+        return bundle.countryCode()
     }
     var etag: String? {
         get {

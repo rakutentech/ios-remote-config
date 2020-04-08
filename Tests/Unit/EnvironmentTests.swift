@@ -12,14 +12,18 @@ class EnvironmentSpec: QuickSpec {
         }
         context("when bundle has valid key-values") {
 
-            it("will return a config url with format <endpoint/app/{app-id}/config>") {
+            it("will return a config url with format <endpoint/app/{app-id}/config?appVersion={appVersion}&osVersion={osVersion}&language={language}&country={country}>") {
                 let mockBundle = BundleMock()
                 mockBundle.mockEndpoint = "https://endpoint.com"
                 mockBundle.mockAppId = "12345"
+                mockBundle.mockAppVersion = "1.2.3"
+                mockBundle.mockOsVersion = "100.0"
+                mockBundle.mockLanguageCode = "FOO"
+                mockBundle.mockCountryCode = "BAR"
 
                 let environment = Environment(bundle: mockBundle)
 
-                expect(environment.configUrl?.absoluteString).to(equal("https://endpoint.com/app/12345/config"))
+                expect(environment.configUrl?.absoluteString).to(equal("https://endpoint.com/app/12345/config?appVersion=1.2.3&osVersion=100.0&language=foo&country=bar"))
             }
 
             it("will return a key url with format <endpoint/keys/{key-id}>") {
@@ -111,6 +115,24 @@ class EnvironmentSpec: QuickSpec {
 
                 expect(environment.sdkVersion).to(equal("foo"))
             }
+
+            it("has the expected language code") {
+                let mockBundle = BundleMock()
+                mockBundle.mockLanguageCode = "foo"
+
+                let environment = Environment(bundle: mockBundle)
+
+                expect(environment.languageCode).to(equal("foo"))
+            }
+
+            it("has the expected country code") {
+                let mockBundle = BundleMock()
+                mockBundle.mockCountryCode = "foo"
+
+                let environment = Environment(bundle: mockBundle)
+
+                expect(environment.countryCode).to(equal("foo"))
+            }
         }
         context("when bundle does not have valid key values") {
             let mockBundleInvalid = BundleMock()
@@ -156,6 +178,14 @@ class EnvironmentSpec: QuickSpec {
 
             it("will return the 'not found' value when sdk version can't be read") {
                 expect(environment.sdkVersion).to(equal(mockBundleInvalid.valueNotFound))
+            }
+
+            it("will return the 'not found' value when language code can't be read") {
+                expect(environment.languageCode).to(equal(mockBundleInvalid.valueNotFound))
+            }
+
+            it("will return the 'not found' value when country code can't be read") {
+                expect(environment.countryCode).to(equal(mockBundleInvalid.valueNotFound))
             }
         }
     }
