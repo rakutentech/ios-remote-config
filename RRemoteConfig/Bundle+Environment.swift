@@ -26,7 +26,12 @@ extension Bundle: EnvironmentSetupProtocol {
     }
 
     func languageCode() -> String? {
-        return Locale.current.languageCode
+        // Use the device's preferred languages rather than Locale.current
+        // because 'current' depends on the languages an app has been localized into
+        guard let language = Locale.preferredLanguages.first else {
+            return Locale.current.languageCode
+        }
+        return Locale(identifier: language).languageCode
     }
 
     func countryCode() -> String? {
