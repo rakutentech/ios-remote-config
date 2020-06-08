@@ -71,15 +71,6 @@ class EnvironmentSpec: QuickSpec {
                 expect(environment.appVersion).to(equal("foo"))
             }
 
-            it("has the expected subscription key") {
-                let mockBundle = BundleMock()
-                mockBundle.mockSubKey = "foo"
-
-                let environment = Environment(bundle: mockBundle)
-
-                expect(environment.subscriptionKey).to(contain("foo"))
-            }
-
             it("has the expected OS version") {
                 let mockBundle = BundleMock()
                 mockBundle.mockOsVersion = "foo"
@@ -132,6 +123,15 @@ class EnvironmentSpec: QuickSpec {
                 let environment = Environment(bundle: mockBundle)
 
                 expect(environment.countryCode).to(equal("foo"))
+            }
+
+            it("has the expected polling delay value") {
+                let mockBundle = BundleMock()
+                mockBundle.mockDelay = 10.12345
+
+                let environment = Environment(bundle: mockBundle)
+
+                expect(environment.pollingDelay).to(equal(10.12345))
             }
         }
         context("when bundle does not have valid key values") {
@@ -186,6 +186,10 @@ class EnvironmentSpec: QuickSpec {
 
             it("will return the 'not found' value when country code can't be read") {
                 expect(environment.countryCode).to(equal(mockBundleInvalid.valueNotFound))
+            }
+
+            it("will return nil when the polling delay can't be read") {
+                expect(environment.pollingDelay).to(beNil())
             }
         }
     }

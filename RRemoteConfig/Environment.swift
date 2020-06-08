@@ -7,6 +7,7 @@ internal protocol EnvironmentSetupProtocol {
     func sdkVersion() -> String
     func languageCode() -> String?
     func countryCode() -> String?
+    func pollingDelay() -> TimeInterval?
 }
 
 internal class Environment {
@@ -52,6 +53,9 @@ internal class Environment {
     }
     var appVersion: String {
         return bundle.value(for: "CFBundleShortVersionString" as String) ?? bundle.valueNotFound
+    }
+    var pollingDelay: TimeInterval? {
+        return bundle.pollingDelay()
     }
     var deviceModel: String {
         return bundle.deviceModel()

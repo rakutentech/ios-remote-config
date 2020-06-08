@@ -8,13 +8,18 @@ extension RunLoop: PollerRunLoopProtocol {
     }
 }
 
+internal enum PollerConstants {
+    static let defaultDelay: TimeInterval = 60.0 * 60.0
+    static let minimumDelay: TimeInterval = 60.0
+}
+
 internal class Poller {
     private let delay: TimeInterval
     private var runLoop: PollerRunLoopProtocol?
     private var timer: Timer?
 
-    init(delay: TimeInterval = 60.0 * 60.0, runLoop: PollerRunLoopProtocol = RunLoop.current) {
-        self.delay = delay
+    init(delay: TimeInterval = PollerConstants.defaultDelay, runLoop: PollerRunLoopProtocol = RunLoop.current) {
+        self.delay = delay < PollerConstants.minimumDelay ? PollerConstants.minimumDelay : delay
         self.runLoop = runLoop
     }
 
