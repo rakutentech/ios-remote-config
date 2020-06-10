@@ -1,25 +1,28 @@
-import XCTest
+import Quick
+import Nimble
+@testable import RRemoteConfig
 
-class FunctionalTests: XCTestCase {
+class FunctionalSpec: QuickSpec {
+    override func spec() {
+        describe("start function") {
+            class MockRunLoop: PollerRunLoopProtocol {
+                var addedTimer: Timer?
 
-    override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
+                func addTimer(_ timer: Timer) {
+                    self.addedTimer = timer
+                }
+            }
 
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
+            it("asynchronously executes the action after the specified delay") {
+                var actionCalled = 0
+                let poller = Poller(delay: PollerConstants.minimumDelay)
 
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
+                poller.start {
+                    actionCalled += 1
+                }
 
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+                expect(actionCalled).toEventually(beGreaterThan(1), timeout: PollerConstants.minimumDelay + 10)
+            }
         }
     }
-
 }

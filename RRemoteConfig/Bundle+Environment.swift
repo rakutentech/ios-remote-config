@@ -37,4 +37,11 @@ extension Bundle: EnvironmentSetupProtocol {
     func countryCode() -> String? {
         return Locale.current.regionCode
     }
+
+    func pollingDelay() -> TimeInterval? {
+        guard let number = self.object(forInfoDictionaryKey: "RRCConfigFetchPollingDelayInSeconds") as? NSNumber else {
+            return nil
+        }
+        return TimeInterval(truncating: number)
+    }
 }
