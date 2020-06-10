@@ -19,7 +19,7 @@ internal class Poller {
     private var timer: Timer?
 
     init(delay: TimeInterval = PollerConstants.defaultDelay, runLoop: PollerRunLoopProtocol = RunLoop.current) {
-        self.delay = delay < PollerConstants.minimumDelay ? PollerConstants.minimumDelay : delay
+        self.delay = max(PollerConstants.minimumDelay, delay)
         self.runLoop = runLoop
     }
 
