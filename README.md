@@ -1,3 +1,4 @@
+![Cocoapods](https://img.shields.io/cocoapods/v/RRemoteConfig)
 [![Build Status](https://travis-ci.org/rakutentech/ios-remote-config.svg?branch=master)](https://travis-ci.org/rakutentech/ios-remote-config)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
@@ -8,7 +9,7 @@ Provides remote configuration for iOS applications.
 
 ## How it works
 
-The module fetches a JSON config from the backend API at launch time and caches the config locally if the payload signature verification succeeds. The config is fetched and cached every 60 minutes.
+The module fetches a JSON config from the backend API at launch time and caches the config locally if the payload signature verification succeeds. The config is fetched and cached every 60 minutes by default.
 
 ## Getting started
 
@@ -38,7 +39,7 @@ Currently we do not host any public APIs but you can create your own APIs and co
 
 To use the module you must set the following values in your app's `Info.plist`.
 
-| Key     | Value     |
+| Key     | Value (String type)    |
 | :---:   | :---:     |
 | `RASApplicationIdentifier` | your_app_id |
 | `RASProjectSubscriptionKey` | your_subscription_key |
@@ -61,6 +62,17 @@ To use the module you must set the following values in your app's `Info.plist`.
 
         // Get the entire config as a dictionary
         let configDictionary = RemoteConfig.getConfig()
+
+## Advanced features
+
+### Configure polling delay
+The polling delay (which defaults to 60 mins) can, optionally, be configured in the app's `Info.plist`:
+
+| Key     | Value (Number type)    |
+| :---:   | :---:     |
+| `RRCConfigFetchPollingDelayInSeconds` | delay in seconds |
+
+Note that the minimum polling delay is 60 seconds. If you try to set a lower value, the polling delay will be 60 seconds.
 
 ## Contributing
 
