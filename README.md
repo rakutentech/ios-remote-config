@@ -81,7 +81,10 @@ See CONTRIBUTING.md for details of how to participate in development of the modu
 #### Running the sample app and unit tests
 
 - Clone or fork the repo
-- Run `bundle exec pod install` in the repo root folder
+- `cd` to the repo folder
+- Set env vars `RAS_APPLICATION_IDENTIFIER`, `RAS_SUBSCRIPTION_KEY` and `RRC_CONFIG_URL` according to the internal integration guide
+* _Important Note_: the generated file `Sample-Secrets.xcconfig` **MUST NOT** be committed to git - it is deliberately ignored by git in the repo's `.gitignore` file
+- Run `bundle install` then `bundle exec pod install` in the repo root folder
 - Open `RRemoteConfig.xcworkspace` in Xcode
 - Select the `SampleApp` scheme then build/run
 - To run the tests press key shortcut command-U
