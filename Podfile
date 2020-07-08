@@ -13,12 +13,16 @@ target 'Tests' do # both Functional and Unit tests
 end
 
 post_install do |installer|
+  # secure xcconfig variables config
+  system("./scripts/configure-secrets.sh")
+
   # Needed so 'internal' module classes can be tested
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
         config.build_settings['ENABLE_TESTABILITY'] = 'YES'
     end
   end
+
   # Enable more warnings for the module's target
   installer.pods_project.targets.select { |target| target.name == 'RRemoteConfig' }.first.build_configurations.each do |config|
     config.build_settings.merge!({

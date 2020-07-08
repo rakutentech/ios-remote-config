@@ -1,0 +1,4 @@
+#include "Pods/Target Support Files/Pods-SampleApp/Pods-SampleApp.release.xcconfig"
+
+// IMPORTANT: Secrets MUST be added to below xcconfig file and that file MUST NOT be added to git.
+#include "Sample-Secrets.xcconfig"
