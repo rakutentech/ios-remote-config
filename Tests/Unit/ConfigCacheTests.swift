@@ -225,7 +225,7 @@ class ConfigCacheSpec: QuickSpec {
                 expect(value).to(equal(["moo": "10", "foo": "coo"]))
             }
         }
-        describe("refreshFromRemote function") {
+        describe("fetch config") {
             let jsonData = #"{"body":{"foo":"bar"},"keyId":"aKey"}"#.data(using: .utf8)!
             let fetcher = FetcherMock(client: APIClient(), environment: Environment())
             let configCache = ConfigCache(fetcher: fetcher, poller: Poller())
@@ -239,76 +239,189 @@ class ConfigCacheSpec: QuickSpec {
                 }
             }
 
-            it("calls the fetcher's fetch function exactly once") {
-                fetcher.fetchConfigCalledNumTimes = 0
-                configCache.refreshFromRemote()
+            describe("fetchAndPollConfig") {
+                it("calls the fetcher exactly once") {
+                    fetcher.fetchConfigCalledNumTimes = 0
+                    configCache.fetchAndPollConfig()
 
-                expect(fetcher.fetchConfigCalledNumTimes).toEventually(equal(1))
+                    expect(fetcher.fetchConfigCalledNumTimes).toEventually(equal(1))
+                }
+
+                describe("when the verification key is found locally") {
+                    fetcher.fetchedConfig = ConfigModel(data: jsonData)
+                    fetcher.fetchedConfig?.signature = "aSig"
+                    let configCache = ConfigCache(fetcher: fetcher,
+                                                  poller: Poller(),
+                                                  cacheUrl: url,
+                                                  keyStore: KeyStoreMock(contents: ["aKey": "1234"]),
+                                                  verifier: verifier)
+
+                    it("writes the fetched config when verification succeeds") {
+                        verifier.verifyOK = true
+
+                        configCache.fetchAndPollConfig()
+
+                        let expected: [String: Any] = [
+                            "config": jsonData,
+                            "signature": "aSig"
+                        ]
+                        expect(NSDictionary(contentsOf: configCache.cacheUrl)).toEventually(equal(expected as NSDictionary), timeout: 2)
+                    }
+
+                    it("does not write the fetched config when verification fails") {
+                        let expected: [AnyHashable: Any] = [:]
+                        NSDictionary(dictionary: expected).write(to: url, atomically: true)
+                        verifier.verifyOK = false
+                        var cacheContents: NSDictionary?
+
+                        configCache.fetchAndPollConfig()
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                            cacheContents = NSDictionary(contentsOf: configCache.cacheUrl)
+                        })
+
+                        expect(cacheContents).toEventually(equal(expected as NSDictionary), timeout: 1.0)
+                    }
+                }
+                describe("when the verification key is not found locally") {
+                    fetcher.fetchedConfig = ConfigModel(data: jsonData)
+                    fetcher.fetchedConfig?.signature = "aSig"
+                    let keyStore = KeyStoreMock(contents: [:])
+                    let configCache = ConfigCache(fetcher: fetcher,
+                                                  poller: Poller(),
+                                                  cacheUrl: url,
+                                                  keyStore: keyStore,
+                                                  verifier: verifier)
+
+                    beforeEach {
+                        keyStore.store = [:]
+                        fetcher.fetchKeyCalledNumTimes = 0
+                    }
+                    it("calls the fetch key function") {
+                        configCache.fetchAndPollConfig()
+
+                        expect(fetcher.fetchKeyCalledNumTimes).toEventually(equal(1))
+                    }
+
+                    it("adds the key after fetching it") {
+                        let jsonData = #"{"id":"aKey","key":"123","createdAt":""}"#.data(using: .utf8)!
+                        fetcher.fetchedKey = KeyModel(data: jsonData)
+
+                        configCache.fetchAndPollConfig()
+
+                        expect(keyStore.store?["aKey"]).toEventually(equal("123"), timeout: 2.0)
+                    }
+                }
             }
+            describe("fetchAndApplyConfig") {
+                it("calls the fetcher exactly once") {
+                    fetcher.fetchConfigCalledNumTimes = 0
+                    configCache.fetchAndApplyConfig { _ in }
 
-            describe("when the verification key is found locally") {
-                fetcher.fetchedConfig = ConfigModel(data: jsonData)
-                fetcher.fetchedConfig?.signature = "aSig"
-                let configCache = ConfigCache(fetcher: fetcher,
-                                              poller: Poller(),
-                                              cacheUrl: url,
-                                              keyStore: KeyStoreMock(contents: ["aKey": "1234"]),
-                                              verifier: verifier)
-
-                it("writes the fetched config when verification succeeds") {
-                    verifier.verifyOK = true
-
-                    configCache.refreshFromRemote()
-
-                    let expected: [String: Any] = [
-                        "config": jsonData,
-                        "signature": "aSig"
-                    ]
-                    expect(NSDictionary(contentsOf: configCache.cacheUrl)).toEventually(equal(expected as NSDictionary), timeout: 2)
+                    expect(fetcher.fetchConfigCalledNumTimes).toEventually(equal(1))
                 }
 
-                it("does not write the fetched config when verification fails") {
-                    let expected: [AnyHashable: Any] = [:]
-                    NSDictionary(dictionary: expected).write(to: url, atomically: true)
-                    verifier.verifyOK = false
-                    var cacheContents: NSDictionary?
+                describe("when the verification key is found locally") {
+                    fetcher.fetchedConfig = ConfigModel(data: jsonData)
+                    fetcher.fetchedConfig?.signature = "aSig"
+                    let configCache = ConfigCache(fetcher: fetcher,
+                                                  poller: Poller(),
+                                                  cacheUrl: url,
+                                                  keyStore: KeyStoreMock(contents: ["aKey": "1234"]),
+                                                  verifier: verifier)
 
-                    configCache.refreshFromRemote()
+                    describe("if verification succeeds") {
+                        beforeEach {
+                            verifier.verifyOK = true
+                        }
+                        it("writes fetched config to cache") {
+                            let expected: [String: Any] = [
+                                "config": jsonData,
+                                "signature": "aSig"
+                            ]
 
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
-                        cacheContents = NSDictionary(contentsOf: configCache.cacheUrl)
-                    })
+                            configCache.fetchAndApplyConfig { _ in }
 
-                    expect(cacheContents).toEventually(equal(expected as NSDictionary), timeout: 1.0)
+                            expect(NSDictionary(contentsOf: configCache.cacheUrl)).toEventually(equal(expected as NSDictionary), timeout: 2)
+                        }
+
+                        it("passes fetched config to completion handler") {
+                            let expected = ["foo": "bar"]
+                            var receivedConfig: [AnyHashable: Any] = ["ying": "yang"]
+
+                            configCache.fetchAndApplyConfig { (config) in
+                                receivedConfig = config
+                            }
+
+                            expect(receivedConfig as NSDictionary).toEventually(equal(expected as NSDictionary), timeout: 2)
+                        }
+
+                        it("sets the fetched config as active directly") {
+                            let expected = ["foo": "bar"]
+                            var receivedConfig: [AnyHashable: Any] = ["ying": "yang"]
+
+                            configCache.fetchAndApplyConfig { (config) in
+                                receivedConfig = config
+                            }
+
+                            expect(receivedConfig as NSDictionary).toEventually(equal(expected as NSDictionary), timeout: 2)
+                        }
+                    }
+                    describe("if verification fails") {
+                        beforeEach {
+                            verifier.verifyOK = false
+                        }
+                        it("does not write the fetched config") {
+                            let expected: [AnyHashable: Any] = [:]
+                            NSDictionary(dictionary: expected).write(to: url, atomically: true)
+                            var cacheContents: NSDictionary?
+
+                            configCache.fetchAndApplyConfig { _ in
+                                cacheContents = NSDictionary(contentsOf: configCache.cacheUrl)
+                            }
+
+                            expect(cacheContents).toEventually(equal(expected as NSDictionary), timeout: 2)
+                        }
+
+                        it("passes empty config to the completion handler") {
+                            var receivedConfig: [AnyHashable: String] = ["foo": "bar"]
+
+                            configCache.fetchAndApplyConfig { (config) in
+                                receivedConfig = config
+                            }
+
+                            expect(receivedConfig.count).toEventually(equal(0), timeout: 2)
+                        }
+                    }
                 }
-            }
-            describe("when the verification key is not found locally") {
-                fetcher.fetchedConfig = ConfigModel(data: jsonData)
-                fetcher.fetchedConfig?.signature = "aSig"
-                let keyStore = KeyStoreMock(contents: [:])
-                let configCache = ConfigCache(fetcher: fetcher,
-                                              poller: Poller(),
-                                              cacheUrl: url,
-                                              keyStore: keyStore,
-                                              verifier: verifier)
+                describe("when the verification key is not found locally") {
+                    fetcher.fetchedConfig = ConfigModel(data: jsonData)
+                    fetcher.fetchedConfig?.signature = "aSig"
+                    let keyStore = KeyStoreMock(contents: [:])
+                    let configCache = ConfigCache(fetcher: fetcher,
+                                                  poller: Poller(),
+                                                  cacheUrl: url,
+                                                  keyStore: keyStore,
+                                                  verifier: verifier)
 
-                beforeEach {
-                    keyStore.store = [:]
-                    fetcher.fetchKeyCalledNumTimes = 0
-                }
-                it("calls the fetch key function") {
-                    configCache.refreshFromRemote()
+                    beforeEach {
+                        keyStore.store = [:]
+                        fetcher.fetchKeyCalledNumTimes = 0
+                    }
+                    it("calls the fetch key function") {
+                        configCache.fetchAndApplyConfig { _ in }
 
-                    expect(fetcher.fetchKeyCalledNumTimes).toEventually(equal(1))
-                }
+                        expect(fetcher.fetchKeyCalledNumTimes).toEventually(equal(1))
+                    }
 
-                it("adds the key after fetching it") {
-                    let jsonData = #"{"id":"aKey","key":"123","createdAt":""}"#.data(using: .utf8)!
-                    fetcher.fetchedKey = KeyModel(data: jsonData)
+                    it("adds the key after fetching it") {
+                        let jsonData = #"{"id":"aKey","key":"123","createdAt":""}"#.data(using: .utf8)!
+                        fetcher.fetchedKey = KeyModel(data: jsonData)
 
-                    configCache.refreshFromRemote()
+                        configCache.fetchAndApplyConfig { _ in }
 
-                    expect(keyStore.store?["aKey"]).toEventually(equal("123"), timeout: 2.0)
+                        expect(keyStore.store?["aKey"]).toEventually(equal("123"), timeout: 2.0)
+                    }
                 }
             }
         }

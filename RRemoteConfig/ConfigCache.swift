@@ -6,19 +6,22 @@ internal class ConfigCache {
     let verifier: Verifier
     private var activeConfig: ConfigModel?
     private var numberFormatter: NumberFormatter
+    private var applyConfigDirectly: Bool = false
 
     init(fetcher: Fetcher,
          poller: Poller,
          cacheUrl: URL = FileManager.getCacheDirectory().appendingPathComponent("rrc-config.plist"),
          initialCacheContents: Data? = nil,
          keyStore: KeyStore = KeyStore(),
-         verifier: Verifier = Verifier()) {
+         verifier: Verifier = Verifier(),
+         applyConfigDirectly: Bool = false) {
         self.fetcher = fetcher
         self.poller = poller
         self.cacheUrl = cacheUrl
         self.numberFormatter = NumberFormatter()
         self.keyStore = keyStore
         self.verifier = verifier
+        self.applyConfigDirectly = applyConfigDirectly
 
         if let data = initialCacheContents {
             self.activeConfig = ConfigModel(data: data)
@@ -42,24 +45,15 @@ internal class ConfigCache {
                 configModel.signature = dictionary["signature"] as? String
 
                 if self.verifyContents(model: configModel) {
-                    Logger.d("Cached contents verified -> set as active config")
+                    Logger.d("Cached config verified -> set as active config")
                     self.activeConfig = configModel
                 } else {
-                    Logger.e("Cached dictionary contents failed verification")
+                    Logger.e("Cached config \(configModel.config) failed verification")
                 }
             }
         }
     }
 
-    func refreshFromRemote() {
-        self.poller.start {
-            DispatchQueue.global(qos: .utility).async {
-                self.fetchConfig()
-            }
-        }
-    }
-
-    // MARK: Get config methods
     func getString(_ key: String, _ fallback: String) -> String {
         guard let config = activeConfig?.config else {
             return fallback
@@ -87,23 +81,50 @@ internal class ConfigCache {
         return activeConfig?.config ?? [:]
     }
 
-    // MARK: Private helpers
-    fileprivate func fetchConfig() {
-        self.fetcher.fetchConfig { (result) in
-            guard let configModel = result else {
-                return Logger.e("Config could not be refreshed from remote")
-            }
-            self.verifyContents(model: configModel, resultHandler: { (verified) in
-                if verified {
-                    let dictionary = [
+    func fetchAndPollConfig() {
+        poller.start {
+            self.fetchConfig(applyDirectly: self.applyConfigDirectly) { _ in }
+        }
+    }
+
+    func fetchAndApplyConfig(completionHandler: @escaping (ConfigDictionary) -> Void) {
+        self.fetchConfig(applyDirectly: true) { (configModel) in
+            completionHandler(configModel?.config ?? ConfigDictionary())
+        }
+    }
+}
+
+// MARK: Fetch and store config
+extension ConfigCache {
+    fileprivate func fetchConfig(applyDirectly: Bool, completionHandler: @escaping (ConfigModel?) -> Void) {
+        DispatchQueue.global(qos: .utility).async {
+            self.fetcher.fetchConfig { (result) in
+                guard let configModel = result else {
+                    completionHandler(nil)
+                    return Logger.e("Config could not be fetched from remote")
+                }
+
+                self.verifyContents(model: configModel, resultHandler: { (verified) in
+                    guard verified else {
+                        completionHandler(nil)
+                        return Logger.e("Fetched config \(configModel.config) failed verification")
+                    }
+
+                    self.write([
                         "config": configModel.jsonData,
                         "signature": configModel.signature as Any
-                    ]
-                    self.write(dictionary)
-                } else {
-                    Logger.e("Fetched dictionary contents failed verification")
-                }
-            })
+                    ])
+
+                    if applyDirectly {
+                        Logger.d("Fetched config verified -> set immediately as active config")
+                        self.activeConfig = configModel
+                    } else {
+                        Logger.d("Fetched config verified -> set as active config on next app launch")
+                    }
+
+                    completionHandler(configModel)
+                })
+            }
         }
     }
 
@@ -117,17 +138,10 @@ internal class ConfigCache {
     }
 }
 
-extension FileManager {
-    class func getCacheDirectory() -> URL {
-        let cachePaths = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)
-        return cachePaths[0]
-    }
-}
-
 // MARK: Payload signature verification
 extension ConfigCache {
     // synchronous verification with local key store
-    func verifyContents(model: ConfigModel) -> Bool {
+    fileprivate func verifyContents(model: ConfigModel) -> Bool {
         guard let keyId = model.keyId,
             let key = keyStore.key(for: keyId),
             let signature = model.signature else {
@@ -140,7 +154,7 @@ extension ConfigCache {
 
     // asynchronous verification - fetches key from backend if key is not
     // found in local key store
-    func verifyContents(model: ConfigModel, resultHandler: @escaping (Bool) -> Void ) {
+    fileprivate func verifyContents(model: ConfigModel, resultHandler: @escaping (Bool) -> Void ) {
         guard let keyId = model.keyId,
             let signature = model.signature else {
                 return resultHandler(false)
@@ -163,5 +177,12 @@ extension ConfigCache {
                 resultHandler(verified)
             }
         }
+    }
+}
+
+extension FileManager {
+    fileprivate class func getCacheDirectory() -> URL {
+        let cachePaths = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)
+        return cachePaths[0]
     }
 }

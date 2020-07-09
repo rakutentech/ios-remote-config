@@ -44,4 +44,11 @@ extension Bundle: EnvironmentSetupProtocol {
         }
         return TimeInterval(truncating: number)
     }
+
+    func applyConfigDirectlyAfterFetch() -> Bool {
+        guard let applyDirectly = self.object(forInfoDictionaryKey: "RRCApplyConfigDirectlyAfterFetch") as? Bool else {
+            return false // not found in plist
+        }
+        return applyDirectly
+    }
 }

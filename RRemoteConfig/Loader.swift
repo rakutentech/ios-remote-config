@@ -5,6 +5,6 @@ import Foundation
 // method.
 public class Loader: NSObject {
     @objc public static func loadRemoteConfig() {
-        RealRemoteConfig.shared.refreshConfig()
+        RealRemoteConfig.shared.fetchAndPollConfig()
     }
 }

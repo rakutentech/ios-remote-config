@@ -9,9 +9,12 @@ internal class RealRemoteConfig {
     init() {
         self.environment = Environment()
         self.apiClient = APIClient()
-        self.fetcher = Fetcher(client: apiClient, environment: environment)
+        self.fetcher = Fetcher(client: apiClient,
+                               environment: environment)
         self.poller = Poller(delay: environment.pollingDelay ?? PollerConstants.defaultDelay)
-        self.cache = ConfigCache(fetcher: fetcher, poller: poller)
+        self.cache = ConfigCache(fetcher: fetcher,
+                                 poller: poller,
+                                 applyConfigDirectly: environment.applyConfigDirectlyAfterFetch)
     }
 
     func getString(_ key: String, _ fallback: String) -> String {
@@ -30,7 +33,11 @@ internal class RealRemoteConfig {
         return cache.getConfig()
     }
 
-    func refreshConfig() {
-        cache.refreshFromRemote()
+    func fetchAndPollConfig() {
+        cache.fetchAndPollConfig()
+    }
+
+    func fetchAndApplyConfig(completionHandler: @escaping (ConfigDictionary) -> Void) {
+        cache.fetchAndApplyConfig(completionHandler: completionHandler)
     }
 }

@@ -2,7 +2,7 @@ protocol Parsable {
     init?(data: Data)
 }
 
-typealias ConfigDictionary = [String: String]
+public typealias ConfigDictionary = [String: String]
 
 internal struct ConfigModel: Parsable {
     let jsonData: Data

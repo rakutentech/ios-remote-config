@@ -42,4 +42,12 @@
     @objc public class func getConfig() -> [String: String] {
         return RealRemoteConfig.shared.getConfig()
     }
+
+    /// Manually trigger a fetch of config values.
+    /// **Note:** Config values are applied directly after fetch.
+    ///
+    /// - Parameter completionHandler: Completion handler that returns the fetched config values as a dictionary
+    @objc public class func fetchAndApplyConfig(completionHandler: @escaping (ConfigDictionary) -> Void) {
+        RealRemoteConfig.shared.fetchAndApplyConfig(completionHandler: completionHandler)
+    }
 }

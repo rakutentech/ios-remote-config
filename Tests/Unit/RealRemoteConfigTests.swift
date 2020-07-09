@@ -36,14 +36,24 @@ class RealRemoteConfigSpec: QuickSpec {
                 expect(RealRemoteConfig.shared.getConfig()).to(equal(["foo": "bar", "moo": "100"]))
             }
         }
-        describe("refreshConfig function") {
-            it("calls config cache refresh") {
+        describe("fetchAndPollConfig function") {
+            it("calls config cache fetch") {
                 RealRemoteConfig.shared.cache = createCacheMock()
-                (RealRemoteConfig.shared.cache as? CacheMock)?.refreshCalled = false
+                (RealRemoteConfig.shared.cache as? CacheMock)?.fetchCalled = false
 
-                RealRemoteConfig.shared.refreshConfig()
+                RealRemoteConfig.shared.fetchAndPollConfig()
 
-                expect((RealRemoteConfig.shared.cache as? CacheMock)?.refreshCalled).to(equal(true))
+                expect((RealRemoteConfig.shared.cache as? CacheMock)?.fetchCalled).to(equal(true))
+            }
+        }
+        describe("fetchAndApplyConfig function") {
+            it("calls config cache fetch") {
+                RealRemoteConfig.shared.cache = createCacheMock()
+                (RealRemoteConfig.shared.cache as? CacheMock)?.fetchCalled = false
+
+                RealRemoteConfig.shared.fetchAndApplyConfig(completionHandler: { _ in } )
+
+                expect((RealRemoteConfig.shared.cache as? CacheMock)?.fetchCalled).to(equal(true))
             }
         }
     }

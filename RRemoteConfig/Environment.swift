@@ -8,6 +8,7 @@ internal protocol EnvironmentSetupProtocol {
     func languageCode() -> String?
     func countryCode() -> String?
     func pollingDelay() -> TimeInterval?
+    func applyConfigDirectlyAfterFetch() -> Bool
 }
 
 internal class Environment {
@@ -53,6 +54,9 @@ internal class Environment {
     }
     var appVersion: String {
         return bundle.value(for: "CFBundleShortVersionString" as String) ?? bundle.valueNotFound
+    }
+    var applyConfigDirectlyAfterFetch: Bool {
+        return bundle.applyConfigDirectlyAfterFetch()
     }
     var pollingDelay: TimeInterval? {
         return bundle.pollingDelay()

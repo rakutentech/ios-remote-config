@@ -133,6 +133,15 @@ class EnvironmentSpec: QuickSpec {
 
                 expect(environment.pollingDelay).to(equal(10.12345))
             }
+
+            it("has the expected 'apply config directly' value") {
+                let mockBundle = BundleMock()
+                mockBundle.mockApplyConfigDirectly = true
+
+                let environment = Environment(bundle: mockBundle)
+
+                expect(environment.applyConfigDirectlyAfterFetch).to(equal(true))
+            }
         }
         context("when bundle does not have valid key values") {
             let mockBundleInvalid = BundleMock()
@@ -190,6 +199,10 @@ class EnvironmentSpec: QuickSpec {
 
             it("will return nil when the polling delay can't be read") {
                 expect(environment.pollingDelay).to(beNil())
+            }
+
+            it("will return false when the 'apply directly' value can't be read") {
+                expect(environment.applyConfigDirectlyAfterFetch).to(beFalse())
             }
         }
     }

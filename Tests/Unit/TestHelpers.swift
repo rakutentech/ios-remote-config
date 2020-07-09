@@ -1,7 +1,6 @@
 @testable import RRemoteConfig
 
 class BundleMock: EnvironmentSetupProtocol {
-
     var mockAppId: String?
     var mockAppName: String?
     var mockAppVersion: String?
@@ -15,6 +14,7 @@ class BundleMock: EnvironmentSetupProtocol {
     var mockCountryCode: String?
     var mockNotFound: String?
     var mockDelay: TimeInterval?
+    var mockApplyConfigDirectly = false
 
     func value(for key: String) -> String? {
         switch key {
@@ -70,13 +70,21 @@ class BundleMock: EnvironmentSetupProtocol {
     func pollingDelay() -> TimeInterval? {
         return mockDelay
     }
+
+    func applyConfigDirectlyAfterFetch() -> Bool {
+        return mockApplyConfigDirectly
+    }
 }
 
 class CacheMock: ConfigCache {
-    var refreshCalled = false
+    var fetchCalled = false
 
-    override func refreshFromRemote() {
-        self.refreshCalled = true
+    override func fetchAndPollConfig() {
+        self.fetchCalled = true
+    }
+
+    override func fetchAndApplyConfig(completionHandler: @escaping (ConfigDictionary) -> Void) {
+        self.fetchCalled = true
     }
 }
 
