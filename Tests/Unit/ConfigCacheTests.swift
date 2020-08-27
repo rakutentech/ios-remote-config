@@ -2,6 +2,8 @@ import Quick
 import Nimble
 @testable import RRemoteConfig
 
+// swiftlint:disable file_length
+
 class ConfigCacheSpec: QuickSpec {
     override func spec() {
         describe("init function") {

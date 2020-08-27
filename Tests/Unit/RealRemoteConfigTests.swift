@@ -51,7 +51,7 @@ class RealRemoteConfigSpec: QuickSpec {
                 RealRemoteConfig.shared.cache = createCacheMock()
                 (RealRemoteConfig.shared.cache as? CacheMock)?.fetchCalled = false
 
-                RealRemoteConfig.shared.fetchAndApplyConfig(completionHandler: { _ in } )
+                RealRemoteConfig.shared.fetchAndApplyConfig(completionHandler: { _ in })
 
                 expect((RealRemoteConfig.shared.cache as? CacheMock)?.fetchCalled).to(equal(true))
             }
