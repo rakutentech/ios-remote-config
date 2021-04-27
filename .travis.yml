@@ -1,18 +1,32 @@
 language: swift
 xcode_workspace: RRemoteConfig.xcworkspace
 xcode_scheme: Tests
-osx_image: xcode11.3
+osx_image: xcode12.4
 
 before_install:
-- pod repo update
+  - pod repo update
+
+cache:
+  - bundler
 
 script:
-- travis_wait fastlane ci
-- bundle exec danger
+  - travis_wait fastlane ci
+  - bundle exec danger
 
 after_success:
-  # generate docs
-- jazzy --xcodebuild-arguments -scheme,Tests --module RRemoteConfig --source-directory RRemoteConfig --podspec RRemoteConfig.podspec --exclude RRemoteConfig/Loader.swift --readme README.md
+  - |
+    set -e
+    curl -sS https://codecov.io/bash > codecov
+
+    # verify checksum
+    VERSION=$(grep -o 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2)
+    for i in 1 256 512; do
+      printf "SHA$i: "
+      curl -sS "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM" | grep codecov | shasum -a $i -c
+    done
+  - bash codecov -J '^RRemoteConfig$' -X gcov
+  # generate docs (no PRs)
+  - test $TRAVIS_PULL_REQUEST = "false" --xcodebuild-arguments -scheme,Tests --module RRemoteConfig --source-directory RRemoteConfig --podspec RRemoteConfig.podspec --exclude RRemoteConfig/Loader.swift --readme README.md
 
 deploy:
   provider: pages
